@@ -1,7 +1,7 @@
 {
  "order": 4,
  "title": "Glass Sphere & Refraction",
- "blurb": "One glass sphere, three ways: a refracting sphere in perfect focus, the same glass flattened into a lens, and the classic depth-of-field shot.",
+ "blurb": "One glass sphere, several ways: a refracting sphere in perfect focus, the same glass flattened into a lens, depth of field, and an animated morph from sphere to lens.",
  "cards": [
   {
    "file": "40-glass-sphere.png",
@@ -13,13 +13,19 @@
    "file": "41-glass-ellipsoid.png",
    "title": "Flattened into a Lens",
    "desc": "The same glass, flattened by an affine matrix into a thick disc facing the camera. Refraction through a transformed surface - a good stress test for the shader.",
-   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 8 reflections/refractions  -  rendered in 8.5 s"
+   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 8 reflections/refractions  -  rendered in 8.4 s"
   },
   {
    "file": "42-glass-depth-of-field.png",
    "title": "Depth of Field",
    "desc": "The glass sphere shot through a thin lens focused mid-scene: the background boxes and walls blur while the spheres stay sharp.",
-   "meta": "1024x1024  -  10x10 lens samples (depth of field)  -  up to 8 reflections/refractions  -  rendered in 48.8 s"
+   "meta": "1024x1024  -  10x10 lens samples (depth of field)  -  up to 8 reflections/refractions  -  rendered in 49.0 s"
+  },
+  {
+   "file": "43-glass-morph.gif",
+   "title": "Sphere to Lens (animated)",
+   "desc": "Ramping the affine matrix from the round sphere (0.2*I) to the flatten transform in even steps. The lens tumbles through an edge-on view, revealing that it really is a thin disc rather than a sphere.",
+   "meta": "480x480  -  16 frames, ping-pong loop  -  rendered in 10.5 s"
   }
  ]
 }
