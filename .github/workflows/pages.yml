@@ -1,36 +1,45 @@
 name: Deploy gallery to GitHub Pages
 
-# Publishes the pre-rendered gallery/ folder as the Pages site on every push to
-# main. The rendered images are committed to the repo, so this only uploads the
-# static files - it does not build or run the ray tracer on the CI runner.
+# Publishes the pre-rendered gallery/ folder as the Pages site. The rendered
+# images are committed, so this only uploads static files - it never builds or
+# runs the ray tracer on the CI runner.
 
 on:
   push:
     branches: [main]
-    paths: ['gallery/**']      # only redeploy when the gallery actually changes
-  workflow_dispatch:            # ...or trigger manually from the Actions tab
+    paths:                             # redeploy when the gallery or this workflow changes
+      - 'gallery/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:                   # ...or trigger manually from the Actions tab
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow one concurrent deployment; newer pushes cancel in-progress ones.
+# One deployment at a time; newer pushes cancel in-progress ones.
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  # Uploads the gallery as a Pages artifact exactly once.
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: gallery            # serve gallery/index.html as the site root
+          path: gallery                # serve gallery/index.html as the site root
+
+  # Deploys that artifact. Kept separate so re-running deploy never re-uploads.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - id: deployment
         uses: actions/deploy-pages@v4
