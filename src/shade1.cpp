@@ -105,10 +105,15 @@ Color Shade( const HitInfo &hit, const Scene &scene, int max_tree_depth )
 				color += PointLightShade( hit, scene, *light, movedPoint, max_tree_depth) / scene.num_lights;
 			}
 		}
-	//	if( Config.enable_specular ) color = GetSpecular( hit, scene, *light, color );
-		if( Config.enable_reflection ) color = GetReflection( hit, scene, color, max_tree_depth );		
-		if( Config.enable_refraction ) color = GetRefraction( hit, scene, color, max_tree_depth );
 	}
+
+	// Reflection and refraction are view-dependent, not light-dependent: evaluate them
+	// ONCE per hit, after all light contributions are summed. Previously these lived inside
+	// the per-light loop, which re-traced the entire reflection/refraction sub-tree once per
+	// light source -- a (num_lights)^depth ray explosion (catastrophic for thin refractive
+	// ellipsoids that trap rays in total internal reflection) plus repeated, incorrect blending.
+	if( Config.enable_reflection ) color = GetReflection( hit, scene, color, max_tree_depth );
+	if( Config.enable_refraction ) color = GetRefraction( hit, scene, color, max_tree_depth );
 
 
 	

@@ -29,4 +29,6 @@ scenes/*
 !scenes/ellipsoids.sdf
 !scenes/spherelight.sdf
 !scenes/blurry.sdf
+!scenes/refract-focus.sdf
+!scenes/refract-flat.sdf
 !scenes/teapot-bvh-hq.sdf.gz

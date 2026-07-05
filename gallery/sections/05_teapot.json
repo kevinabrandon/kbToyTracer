@@ -1,0 +1,13 @@
+{
+ "order": 5,
+ "title": "Utah Teapot",
+ "blurb": "The showpiece: a quarter-million triangles carried by the acceleration structure, reflective on a reflective floor.",
+ "cards": [
+  {
+   "file": "50-teapot.png",
+   "title": "Reflective Teapot",
+   "desc": "The Utah teapot at 229,921 triangles - reflective, on a reflective checkerboard floor. Only tractable because of the BVH acceleration structure; each ray finds its triangle in log time instead of scanning all quarter-million.",
+   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 6 reflections/refractions  -  rendered in 7.3 s"
+  }
+ ]
+}

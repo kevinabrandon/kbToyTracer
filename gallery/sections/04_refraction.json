@@ -1,0 +1,25 @@
+{
+ "order": 4,
+ "title": "Glass Sphere & Refraction",
+ "blurb": "One glass sphere, three ways: a refracting sphere in perfect focus, the same glass flattened into a lens, and the classic depth-of-field shot.",
+ "cards": [
+  {
+   "file": "40-glass-sphere.png",
+   "title": "Refracting Sphere",
+   "desc": "A glass sphere in a Cornell-style room, in perfect focus. It acts as a lens: the room appears inverted and shrunk inside it.",
+   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 8 reflections/refractions  -  rendered in 4.3 s"
+  },
+  {
+   "file": "41-glass-ellipsoid.png",
+   "title": "Flattened into a Lens",
+   "desc": "The same glass, flattened by an affine matrix into a thick disc facing the camera. Refraction through a transformed surface - a good stress test for the shader.",
+   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 8 reflections/refractions  -  rendered in 8.5 s"
+  },
+  {
+   "file": "42-glass-depth-of-field.png",
+   "title": "Depth of Field",
+   "desc": "The glass sphere shot through a thin lens focused mid-scene: the background boxes and walls blur while the spheres stay sharp.",
+   "meta": "1024x1024  -  10x10 lens samples (depth of field)  -  up to 8 reflections/refractions  -  rendered in 48.8 s"
+  }
+ ]
+}
