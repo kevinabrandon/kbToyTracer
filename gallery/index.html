@@ -1,0 +1,54 @@
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kbToyTracer - render gallery</title>
+<style>
+ body{background:#15161a;color:#e6e6e6;font-family:system-ui,sans-serif;margin:0;padding:24px}
+ h1{font-weight:600;margin:0 0 4px}
+ .lead{color:#8a8f98;margin:0 0 28px;max-width:74ch}
+ h2{font-weight:600;font-size:20px;margin:34px 0 2px;border-bottom:1px solid #2a2d36;padding-bottom:6px}
+ .blurb{color:#8a8f98;margin:0 0 16px;max-width:74ch;font-size:14px}
+ .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+ .card{background:#1e2027;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px #0006}
+ .card img{width:100%;display:block;background:#000;cursor:zoom-in;aspect-ratio:1/1}
+ .body{padding:11px 13px}
+ .title{font-size:15px;font-weight:600;margin:0 0 4px}
+ .desc{font-size:13px;color:#c8ccd4;line-height:1.45;margin:0 0 7px}
+ .meta{font-size:11.5px;color:#8a8f98;font-family:ui-monospace,monospace;line-height:1.5}
+ a{color:inherit;text-decoration:none}
+</style></head><body>
+<h1>kbToyTracer - render gallery</h1>
+<p class="lead">Rendered by James Arvo's toytracer (UC Irvine, Fall 2004), extended by
+Kevin Brandon and resurrected in 2026. Organized by feature; every image is rendered fresh
+by the section scripts. Click any image for full size.</p>
+
+<h2>Class Scenes</h2>
+<p class="blurb">The two milestones from the course: implementing reflection, then affine transformations, on the simple scene shown in class.</p>
+<div class="grid">
+<div class="card"><a href="01-reflection.png" target="_blank"><img src="01-reflection.png" loading="lazy"></a><div class="body"><p class="title">Reflection</p><p class="desc">The scene shown in class: a reflective sphere and two blocks.</p><p class="meta">1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 6 reflections/refractions  -  rendered in 0.9 s</p></div></div>
+<div class="card"><a href="02-matrix.png" target="_blank"><img src="02-matrix.png" loading="lazy"></a><div class="body"><p class="title">Affine Transformation</p><p class="desc">The same scene, the sphere squashed into an ellipsoid by a 3x4 affine matrix.</p><p class="meta">1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 6 reflections/refractions  -  rendered in 1.2 s</p></div></div>
+</div>
+<h2>Spheres &amp; Ellipsoids</h2>
+<p class="blurb">Building up one feature at a time on a field of 200 objects: plain spheres, then the same objects transformed into ellipsoids, then made reflective.</p>
+<div class="grid">
+<div class="card"><a href="10-spheres.png" target="_blank"><img src="10-spheres.png" loading="lazy"></a><div class="body"><p class="title">Spheres</p><p class="desc">200 diffuse spheres with soft self-shadowing - the starting point.</p><p class="meta">1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 1 reflections/refractions  -  rendered in 2.3 s</p></div></div>
+<div class="card"><a href="11-ellipsoids-plain.png" target="_blank"><img src="11-ellipsoids-plain.png" loading="lazy"></a><div class="body"><p class="title">Affine Ellipsoids</p><p class="desc">The same 200 spheres, each squashed into an ellipsoid by its own affine matrix. No reflection.</p><p class="meta">1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 1 reflections/refractions  -  rendered in 3.9 s</p></div></div>
+<div class="card"><a href="12-ellipsoids-reflective.png" target="_blank"><img src="12-ellipsoids-reflective.png" loading="lazy"></a><div class="body"><p class="title">Reflective Ellipsoids</p><p class="desc">The same 200 ellipsoids, now reflective - each mirrors its neighbors.</p><p class="meta">1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 6 reflections/refractions  -  rendered in 8.9 s</p></div></div>
+</div>
+<h2>Area Light Sources</h2>
+<p class="blurb">Soft shadows from a spherical light, approximated by Monte-Carlo sampling. Watch the shadow noise vanish as the sample count climbs from 1 to 49.</p>
+<div class="grid">
+<div class="card"><a href="20-spherelight-01.png" target="_blank"><img src="20-spherelight-01.png" loading="lazy"></a><div class="body"><p class="title">Area Light - 1 sample</p><p class="desc">A spherical light softly illuminating boxes and a ball, sampled with 1x1 = 1 Monte-Carlo shadow samples per point. Very noisy with a single sample.</p><p class="meta">1024x1024  -  1 ray/pixel  -  1x1 = 1 area-light samples  -  rendered in 0.4 s</p></div></div>
+<div class="card"><a href="20-spherelight-04.png" target="_blank"><img src="20-spherelight-04.png" loading="lazy"></a><div class="body"><p class="title">Area Light - 4 samples</p><p class="desc">A spherical light softly illuminating boxes and a ball, sampled with 2x2 = 4 Monte-Carlo shadow samples per point. Softening as samples increase.</p><p class="meta">1024x1024  -  1 ray/pixel  -  2x2 = 4 area-light samples  -  rendered in 0.9 s</p></div></div>
+<div class="card"><a href="20-spherelight-09.png" target="_blank"><img src="20-spherelight-09.png" loading="lazy"></a><div class="body"><p class="title">Area Light - 9 samples</p><p class="desc">A spherical light softly illuminating boxes and a ball, sampled with 3x3 = 9 Monte-Carlo shadow samples per point. Softening as samples increase.</p><p class="meta">1024x1024  -  1 ray/pixel  -  3x3 = 9 area-light samples  -  rendered in 1.8 s</p></div></div>
+<div class="card"><a href="20-spherelight-16.png" target="_blank"><img src="20-spherelight-16.png" loading="lazy"></a><div class="body"><p class="title">Area Light - 16 samples</p><p class="desc">A spherical light softly illuminating boxes and a ball, sampled with 4x4 = 16 Monte-Carlo shadow samples per point. Softening as samples increase.</p><p class="meta">1024x1024  -  1 ray/pixel  -  4x4 = 16 area-light samples  -  rendered in 3.0 s</p></div></div>
+<div class="card"><a href="20-spherelight-25.png" target="_blank"><img src="20-spherelight-25.png" loading="lazy"></a><div class="body"><p class="title">Area Light - 25 samples</p><p class="desc">A spherical light softly illuminating boxes and a ball, sampled with 5x5 = 25 Monte-Carlo shadow samples per point. Smooth soft shadows.</p><p class="meta">1024x1024  -  1 ray/pixel  -  5x5 = 25 area-light samples  -  rendered in 4.4 s</p></div></div>
+<div class="card"><a href="20-spherelight-36.png" target="_blank"><img src="20-spherelight-36.png" loading="lazy"></a><div class="body"><p class="title">Area Light - 36 samples</p><p class="desc">A spherical light softly illuminating boxes and a ball, sampled with 6x6 = 36 Monte-Carlo shadow samples per point. Smooth soft shadows.</p><p class="meta">1024x1024  -  1 ray/pixel  -  6x6 = 36 area-light samples  -  rendered in 6.1 s</p></div></div>
+<div class="card"><a href="20-spherelight-49.png" target="_blank"><img src="20-spherelight-49.png" loading="lazy"></a><div class="body"><p class="title">Area Light - 49 samples</p><p class="desc">A spherical light softly illuminating boxes and a ball, sampled with 7x7 = 49 Monte-Carlo shadow samples per point. Smooth soft shadows.</p><p class="meta">1024x1024  -  1 ray/pixel  -  7x7 = 49 area-light samples  -  rendered in 8.3 s</p></div></div>
+</div>
+<h2>Teapot &amp; Depth of Field</h2>
+<p class="blurb">The showpieces: the acceleration structure carrying a quarter-million triangles, and the lens model producing depth of field.</p>
+<div class="grid">
+<div class="card"><a href="30-teapot.png" target="_blank"><img src="30-teapot.png" loading="lazy"></a><div class="body"><p class="title">Reflective Teapot</p><p class="desc">The Utah teapot at 229,921 triangles - reflective, on a reflective checkerboard floor. Only tractable because of the BVH acceleration structure.</p><p class="meta">1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 6 reflections/refractions  -  rendered in 13.8 s</p></div></div>
+<div class="card"><a href="31-depth-of-field.png" target="_blank"><img src="31-depth-of-field.png" loading="lazy"></a><div class="body"><p class="title">Depth of Field + Refraction</p><p class="desc">A glass sphere (refraction) in a Cornell-style room, shot through a lens focused mid-scene - the background blurs while the spheres stay sharp.</p><p class="meta">1024x1024  -  10x10 lens samples (depth of field)  -  up to 6 reflections/refractions  -  rendered in 3 min 1 s</p></div></div>
+</div>
+</body></html>

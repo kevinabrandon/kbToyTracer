@@ -1,0 +1,25 @@
+{
+ "order": 2,
+ "title": "Spheres & Ellipsoids",
+ "blurb": "Building up one feature at a time on a field of 200 objects: plain spheres, then the same objects transformed into ellipsoids, then made reflective.",
+ "cards": [
+  {
+   "file": "10-spheres.png",
+   "title": "Spheres",
+   "desc": "200 diffuse spheres with soft self-shadowing - the starting point.",
+   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 1 reflections/refractions  -  rendered in 2.3 s"
+  },
+  {
+   "file": "11-ellipsoids-plain.png",
+   "title": "Affine Ellipsoids",
+   "desc": "The same 200 spheres, each squashed into an ellipsoid by its own affine matrix. No reflection.",
+   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 1 reflections/refractions  -  rendered in 3.9 s"
+  },
+  {
+   "file": "12-ellipsoids-reflective.png",
+   "title": "Reflective Ellipsoids",
+   "desc": "The same 200 ellipsoids, now reflective - each mirrors its neighbors.",
+   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 6 reflections/refractions  -  rendered in 8.9 s"
+  }
+ ]
+}

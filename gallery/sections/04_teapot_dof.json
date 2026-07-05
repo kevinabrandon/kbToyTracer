@@ -1,0 +1,19 @@
+{
+ "order": 4,
+ "title": "Teapot & Depth of Field",
+ "blurb": "The showpieces: the acceleration structure carrying a quarter-million triangles, and the lens model producing depth of field.",
+ "cards": [
+  {
+   "file": "30-teapot.png",
+   "title": "Reflective Teapot",
+   "desc": "The Utah teapot at 229,921 triangles - reflective, on a reflective checkerboard floor. Only tractable because of the BVH acceleration structure.",
+   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 6 reflections/refractions  -  rendered in 13.8 s"
+  },
+  {
+   "file": "31-depth-of-field.png",
+   "title": "Depth of Field + Refraction",
+   "desc": "A glass sphere (refraction) in a Cornell-style room, shot through a lens focused mid-scene - the background blurs while the spheres stay sharp.",
+   "meta": "1024x1024  -  10x10 lens samples (depth of field)  -  up to 6 reflections/refractions  -  rendered in 3 min 1 s"
+  }
+ ]
+}

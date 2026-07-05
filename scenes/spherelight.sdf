@@ -1,0 +1,80 @@
+# This is a test scene for Homework #2, which focuses on
+# area light sources.  In this scene there is a large
+# sphere illuminating a collection of boxes and one sphere,
+# which creates soft shadows.
+
+eye          (5.0,-2.0, 2.8)
+lookat       (0.0, 1.1, 0.25)
+up           (0.0, 0.0, 1.0)
+vpdist       2.40
+
+amblight     [0.12, 0.12, 0.12]
+bgcolor      [0.15, 0.15, 0.25]
+
+
+begin BVH
+
+    ## Spherical light source.
+
+    sphere       (-0.3, -0.4, 2.5) 0.6
+    diffuse      [1.0, 1.0, 1.0]
+    emission     [5.0, 5.0, 5.0]
+    specular     [1.00, 0.85, 0.75]
+    reflectivity 0
+    Phong_exp    0
+
+
+    ## Large blue box.
+
+    box          (0, 0, 0) (1, 1, 1) 
+    diffuse      [0.54, 0.53, 0.87]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+
+    ## short red box.
+
+    box          (0.25, -1.25, 0) (1.5, -0.25, 0.5) 
+    diffuse      [0.87, 0.53, 0.54]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+
+    ## Skinny purple box.
+
+    box         (0.5, -1, 0) (0.7, -0.7, 1.0) 
+    diffuse      [0.87, 0.53, 0.87]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+
+    ## Little purple box on top of the red one.
+
+    box          (1.8, 0, 0) (1.9, 0.1, 2.0) 
+    diffuse      [0.87, 0.53, 0.87]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+
+    ## Green ball.
+
+    sphere       (1.5, 1.60, 0.75) 0.75
+    diffuse      [0.54, 0.87, 0.53]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+
+    ## The floor
+
+    box          (-4, -6, -1) (4, 6, 0)
+    diffuse      [0.85, 0.85, 0.85]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+end

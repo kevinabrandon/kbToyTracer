@@ -1,0 +1,49 @@
+{
+ "order": 3,
+ "title": "Area Light Sources",
+ "blurb": "Soft shadows from a spherical light, approximated by Monte-Carlo sampling. Watch the shadow noise vanish as the sample count climbs from 1 to 49.",
+ "cards": [
+  {
+   "file": "20-spherelight-01.png",
+   "title": "Area Light - 1 sample",
+   "desc": "A spherical light softly illuminating boxes and a ball, sampled with 1x1 = 1 Monte-Carlo shadow samples per point. Very noisy with a single sample.",
+   "meta": "1024x1024  -  1 ray/pixel  -  1x1 = 1 area-light samples  -  rendered in 0.4 s"
+  },
+  {
+   "file": "20-spherelight-04.png",
+   "title": "Area Light - 4 samples",
+   "desc": "A spherical light softly illuminating boxes and a ball, sampled with 2x2 = 4 Monte-Carlo shadow samples per point. Softening as samples increase.",
+   "meta": "1024x1024  -  1 ray/pixel  -  2x2 = 4 area-light samples  -  rendered in 0.9 s"
+  },
+  {
+   "file": "20-spherelight-09.png",
+   "title": "Area Light - 9 samples",
+   "desc": "A spherical light softly illuminating boxes and a ball, sampled with 3x3 = 9 Monte-Carlo shadow samples per point. Softening as samples increase.",
+   "meta": "1024x1024  -  1 ray/pixel  -  3x3 = 9 area-light samples  -  rendered in 1.8 s"
+  },
+  {
+   "file": "20-spherelight-16.png",
+   "title": "Area Light - 16 samples",
+   "desc": "A spherical light softly illuminating boxes and a ball, sampled with 4x4 = 16 Monte-Carlo shadow samples per point. Softening as samples increase.",
+   "meta": "1024x1024  -  1 ray/pixel  -  4x4 = 16 area-light samples  -  rendered in 3.0 s"
+  },
+  {
+   "file": "20-spherelight-25.png",
+   "title": "Area Light - 25 samples",
+   "desc": "A spherical light softly illuminating boxes and a ball, sampled with 5x5 = 25 Monte-Carlo shadow samples per point. Smooth soft shadows.",
+   "meta": "1024x1024  -  1 ray/pixel  -  5x5 = 25 area-light samples  -  rendered in 4.4 s"
+  },
+  {
+   "file": "20-spherelight-36.png",
+   "title": "Area Light - 36 samples",
+   "desc": "A spherical light softly illuminating boxes and a ball, sampled with 6x6 = 36 Monte-Carlo shadow samples per point. Smooth soft shadows.",
+   "meta": "1024x1024  -  1 ray/pixel  -  6x6 = 36 area-light samples  -  rendered in 6.1 s"
+  },
+  {
+   "file": "20-spherelight-49.png",
+   "title": "Area Light - 49 samples",
+   "desc": "A spherical light softly illuminating boxes and a ball, sampled with 7x7 = 49 Monte-Carlo shadow samples per point. Smooth soft shadows.",
+   "meta": "1024x1024  -  1 ray/pixel  -  7x7 = 49 area-light samples  -  rendered in 8.3 s"
+  }
+ ]
+}

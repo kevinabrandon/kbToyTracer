@@ -1,0 +1,19 @@
+{
+ "order": 1,
+ "title": "Class Scenes",
+ "blurb": "The two milestones from the course: implementing reflection, then affine transformations, on the simple scene shown in class.",
+ "cards": [
+  {
+   "file": "01-reflection.png",
+   "title": "Reflection",
+   "desc": "The scene shown in class: a reflective sphere and two blocks.",
+   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 6 reflections/refractions  -  rendered in 0.9 s"
+  },
+  {
+   "file": "02-matrix.png",
+   "title": "Affine Transformation",
+   "desc": "The same scene, the sphere squashed into an ellipsoid by a 3x4 affine matrix.",
+   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 6 reflections/refractions  -  rendered in 1.2 s"
+  }
+ ]
+}

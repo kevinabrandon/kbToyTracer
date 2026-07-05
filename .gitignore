@@ -1,0 +1,32 @@
+# Build artifacts and render outputs
+*.o
+*.obj
+*.exe
+*.ppm
+a.out
+kbtoytracer
+build/
+__pycache__/
+*.pyc
+
+# Tooling and assets not needed to run the gallery (kept locally, not published here)
+tools/
+assets/
+legacy/
+
+# Loose top-level renders (the committed showcase lives in gallery/)
+/render-*.png
+/wallpaper-*.png
+
+# Scenes: publish only the ones the gallery uses. The 229k-triangle teapot ships
+# gzipped (scenes/teapot-bvh-hq.sdf.gz) and is decompressed on demand by
+# gallery_lib.ensure_scene(); the raw .sdf stays out of the repo.
+scenes/*
+!scenes/scene1-reflection.sdf
+!scenes/scene2-matrix.sdf
+!scenes/spheres.sdf
+!scenes/ellipsoids-plain.sdf
+!scenes/ellipsoids.sdf
+!scenes/spherelight.sdf
+!scenes/blurry.sdf
+!scenes/teapot-bvh-hq.sdf.gz
