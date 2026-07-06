@@ -45,6 +45,9 @@ struct kbConfig
     bool enable_shading         = true;
     bool enable_specular        = true;
     bool enable_shadows         = true;
+    // When on, shadow rays accumulate transmittance through refractive blockers
+    // (glass casts a lighter shadow) instead of a hard yes/no occlusion. No caustics.
+    bool enable_transparent_shadows = false;
     bool enable_reflection      = true;
     bool enable_refraction      = true;
     bool enable_indirect_light  = false;

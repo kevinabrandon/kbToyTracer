@@ -307,23 +307,40 @@ Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &lig
 	
 		if(Config.enable_shadows)
 		{
-			// here we find if we are in a shadow
 			Ray toLight;
-			HitInfo info;                  
-			info.ignore = NULL;									// Don't ignore any objects.
-			info.distance = Length(lightPos - hit.point);		// Distance to the light source.
 			toLight.direction = direcToLight;					// Direction to the light source.
-			
-			// the origin must be lifted of the surface of the object
-			toLight.origin = movedPoint;	// point that starts in shadow
-	
-			// To find if we are in the shadow we cast a ray twoards the light
-			// if there was an intersection and it was not the light then 
-			// we are in the shadow of an object, and the color should be black.
-			if(Cast(toLight, scene, info))
+			toLight.origin = movedPoint;						// lifted off the surface
+
+			if(Config.enable_transparent_shadows)
 			{
-				// there was something between us and light
-				if(!info.object->material.Emitter())	color = black;
+				// March toward the light, accumulating transmittance through refractive
+				// blockers instead of a hard yes/no occlusion. Opaque blockers still fully
+				// shadow; glass lets its 'refractivity' fraction of light pass at each
+				// surface crossing. (This lightens shadows under glass; it does NOT make
+				// caustics -- the light isn't actually focused, that needs photon mapping.)
+				double transmittance = 1.0;
+				for( int guard = 0; guard < 32; guard++ )
+				{
+					HitInfo info;
+					info.ignore = NULL;
+					info.distance = Length(lightPos - toLight.origin);
+					if( !Cast(toLight, scene, info) ) break;			// clear path to light
+					if( info.object->material.Emitter() ) break;		// reached the light
+					double refr = info.object->material.refractivity;
+					if( refr <= 0.0 ) { transmittance = 0.0; break; }	// opaque -> full shadow
+					transmittance *= refr;								// glass -> partial pass
+					toLight.origin = info.point + direcToLight * 0.001;	// step past this surface
+				}
+				color = color * transmittance;
+			}
+			else
+			{
+				// Original hard shadow: any non-emitter blocker -> fully in shadow.
+				HitInfo info;
+				info.ignore = NULL;
+				info.distance = Length(lightPos - hit.point);
+				if( Cast(toLight, scene, info) )
+					if( !info.object->material.Emitter() )	color = black;
 			}
 		}
 	
