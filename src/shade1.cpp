@@ -108,23 +108,23 @@ Color Shade( const HitInfo &hit, const Scene &scene, int max_tree_depth )
 	}
 
 	// Reflection and refraction are view-dependent, not light-dependent: evaluate them
-	// ONCE per hit, after all light contributions are summed. Previously these lived inside
-	// the per-light loop, which re-traced the entire reflection/refraction sub-tree once per
-	// light source -- a (num_lights)^depth ray explosion (catastrophic for thin refractive
-	// ellipsoids that trap rays in total internal reflection) plus repeated, incorrect blending.
+	// ONCE per hit, after all light contributions are summed. (Previously these lived inside
+	// the per-light loop, causing a (num_lights)^depth ray explosion and repeated blending.)
 	if( Config.enable_reflection ) color = GetReflection( hit, scene, color, max_tree_depth );
-	if( Config.enable_refraction ) color = GetRefraction( hit, scene, color, max_tree_depth );
 
-
-	
-	// here we add ambient color to the scene.
-	// this way all the shadows aren't just black
-	// Use THIS surface's own diffuse for the ambient term. The shared 'diffuse'
-	// scratch may have been clobbered by the recursive reflection shading above.
+	// Ambient (a flat fill so shadows aren't pure black) is added here -- AFTER reflection
+	// but BEFORE refraction -- so the refraction blend attenuates it by (1-refractivity).
+	// Added after refraction instead, a transparent surface dumps its full ambient fill on
+	// top of whatever you see through it, and that fill compounds through the refraction
+	// recursion (a bright bloom in dense glass). Placing it here leaves opaque and purely
+	// reflective scenes unchanged. (Use THIS surface's own diffuse; the shared 'diffuse'
+	// scratch may have been clobbered by the recursive reflection shading above.)
 	Color ambDiffuse = ( hit.object->material.texture == NULL )
 		? hit.object->material.diffuse
 		: hit.object->material.texture->GetColorFromUV( hit.uv, hit.point );
 	color += ambDiffuse * scene.ambient;
+
+	if( Config.enable_refraction ) color = GetRefraction( hit, scene, color, max_tree_depth );
 
 	return color;
 } 
