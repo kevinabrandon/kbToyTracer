@@ -86,8 +86,12 @@ bool List::Intersect( const Ray &ray, HitInfo &hitinfo ) const
 				{
 					hitinfo.distance = tempDistance;
 					hitinfo.point = tempPoint;
-					hitinfo.ray.direction = tempRay.direction;
-					hitinfo.ray.origin = tempRay.origin;
+					// The incident ray is simply the original world-space ray. Copy the
+					// whole struct so its direction, origin, AND type carry through. The old
+					// code rebuilt direction/origin by round-tripping through the transform
+					// (wrong for non-uniform scale) and dropped .type entirely, which broke
+					// refraction's inside/outside logic on transformed primitives.
+					hitinfo.ray = ray;
 					// transform the normal to the "original domain"
 					hitinfo.normal =  Unit(Inverse(Transpose(node->matrix .mat)) * tempHitInfo.normal );
 					hitinfo.object = tempHitInfo.object;

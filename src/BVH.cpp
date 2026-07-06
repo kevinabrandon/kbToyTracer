@@ -83,8 +83,7 @@ static bool hitChild( List_node *node, const Ray &ray, HitInfo &hitinfo )
 
     hitinfo.distance      = d;
     hitinfo.point         = p;
-    hitinfo.ray.origin    = ray.origin;
-    hitinfo.ray.direction = ray.direction;
+    hitinfo.ray           = ray;   // whole ray incl. .type (was dropping type -> broke refraction on transforms)
     hitinfo.normal        = Unit( Inverse( Transpose( node->matrix.mat ) ) * temp.normal );
     hitinfo.object        = temp.object;
     hitinfo.uv            = temp.uv;
