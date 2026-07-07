@@ -189,29 +189,49 @@ Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, 
 	double irad = 0;
 	
 	for(int i = 0; i < dl*dl; i++)
-	{			
-		// check to see if this one pos is in 'shadow'
+	{
+		// Direction to this light sample, and its geometric (cosine) term.
 		Vec3 lightPos = samples[i].P;
 		Vec3 direcToLight = Unit(lightPos - hit.point);
+		double cosineOfAngle = direcToLight * hit.normal / (Length(direcToLight) * Length(hit.normal));
+		if(cosineOfAngle <= 0) continue;   // sample below the horizon; contributes nothing
+
 		Ray toLight;
-		HitInfo junkInfo;
-		junkInfo.ignore = &light;
-		junkInfo.distance = Infinity;
 		toLight.direction = direcToLight;
 		toLight.origin = movedPoint;
-		if(!Cast(toLight, scene, junkInfo))
+
+		// Visibility. 'transmittance' is the fraction of the sample's light that
+		// reaches the surface: 1 = clear, 0 = fully blocked, in-between when
+		// transparent shadows are on and the path crosses refractive (glass) blockers.
+		double transmittance = 1.0;
+		if(Config.enable_transparent_shadows)
 		{
-			// hit function equals one, so we need to add the cosine of the 
-			// angle between point P and the vector to the sample.
-			double cosineOfAngle = (float)(direcToLight * hit.normal / (Length(direcToLight) * Length (hit.normal)));
-			if(cosineOfAngle < 0) cosineOfAngle = 0;
-			irad += cosineOfAngle; 
-	 	}
+			// March toward the sample, accumulating transmittance through refractive
+			// blockers instead of a hard yes/no occlusion (glass casts a lighter
+			// shadow). Mirrors the point-light path in PointLightShade(). No caustics.
+			for(int guard = 0; guard < 32; guard++)
+			{
+				HitInfo info;
+				info.ignore = &light;                               // don't shadow on the light itself
+				info.distance = Length(lightPos - toLight.origin);  // only occluders before the sample
+				if(!Cast(toLight, scene, info)) break;              // clear path to the light
+				if(info.object->material.Emitter()) break;          // reached an emitter
+				double refr = info.object->material.refractivity;
+				if(refr <= 0.0) { transmittance = 0.0; break; }     // opaque -> full shadow
+				transmittance *= refr;                              // glass -> partial pass
+				toLight.origin = info.point + direcToLight * 0.001; // step past this surface
+			}
+		}
 		else
 		{
-			// hit function equals zero, so do not add anything to irad.
+			// Original hard shadow: any non-light blocker fully occludes the sample.
+			HitInfo junkInfo;
+			junkInfo.ignore = &light;
+			junkInfo.distance = Infinity;
+			if(Cast(toLight, scene, junkInfo)) transmittance = 0.0;
 		}
-	
+
+		irad += cosineOfAngle * transmittance;
 	}
 	
 	// at this point irad is simply a sum of all the cosines to each
