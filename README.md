@@ -8,7 +8,7 @@ procedural and image textures, depth of field, a uniform spatial subdivision, an
 bounding volume hierarchy. In 2026 I recovered it from an old CD and got it building and
 rendering again on Linux.
 
-![Reflective teapot](gallery/30-teapot.png)
+![Reflective teapot](gallery/50-teapot.png)
 
 ## Quick start
 
@@ -24,7 +24,7 @@ understand what the tracer does and how it's driven.
 To render a single scene yourself:
 
 ```sh
-./kbtoytracer scenes/spheres.sdf out.ppm kbtoytracer.cfg
+./kbtoytracer scenes/scene1-reflection.sdf out.ppm kbtoytracer.cfg
 ```
 
 The arguments are `<scene.sdf> [output.ppm] [config.cfg]`.
@@ -36,10 +36,11 @@ script each, all sharing `gallery_lib.py`:
 
 | Script | What it shows |
 |---|---|
-| `gen_class.py` | Reflection, then affine transforms (the two class milestones) |
-| `gen_spheres_ellipsoids.py` | 200 spheres → ellipsoids → reflective ellipsoids, one feature at a time |
+| `gen_class.py` | The class progression: flat sphere → box intersector → shading → shadows → specular → reflection → affine transform |
 | `gen_arealights.py` | Soft shadows converging as Monte-Carlo samples go 1 → 49 |
-| `gen_teapot_dof.py` | A 229,921-triangle teapot (via the BVH) and a depth-of-field frame |
+| `gen_spheres_ellipsoids.py` | 200 spheres → ellipsoids → reflective → refractive glass, in a colored room |
+| `gen_refraction.py` | A glass sphere: a depth-of-field focus rack and a sphere → lens morph |
+| `gen_teapot.py` | A 229,921-triangle teapot, traced through the BVH |
 
 Each script is a short list of `(scene, title, config-overrides)` tuples. Reading one shows
 you exactly which config knobs produce which effect, and each rendered card reports the
