@@ -184,7 +184,7 @@ bool MakeImage( const Camera &cam, const Lens &lens, const Scene &scene, int xre
 				I(i,j) = ToneMap( Trace( ray, scene, Config.numBounces ) );
 			}
 		}
-		if( bDisplayMessages && i % 10 == 0 ) printf( "\r\t%6.2f%c Complete", ( ( i / ( double ) smallRes ) * 100.0 ), '%' );
+		if( bDisplayMessages && i % 10 == 0 ) { printf( "\r\t%6.2f%c Complete", ( ( i / ( double ) smallRes ) * 100.0 ), '%' ); fflush( stdout ); }
 	}
 
 	if( bDisplayMessages )	
