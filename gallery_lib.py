@@ -33,6 +33,33 @@ def fmt_time(s):
     return f"{s:.1f} s" if s < 60 else f"{int(s//60)} min {int(s%60)} s"
 
 
+def detect_machine():
+    """Describe the machine actually running the render, so a clone reports its own
+    CPU / cores / OS alongside its own timings. Linux-first, with graceful fallbacks."""
+    import platform
+    cpu = platform.processor() or platform.machine() or "unknown CPU"
+    try:                                            # Linux
+        for line in open("/proc/cpuinfo"):
+            if line.startswith("model name"):
+                cpu = line.split(":", 1)[1].strip(); break
+    except OSError:
+        try:                                        # macOS
+            cpu = subprocess.check_output(["sysctl", "-n", "machdep.cpu.brand_string"],
+                                          text=True).strip()
+        except Exception:
+            pass
+    cores = os.cpu_count() or 1
+    osname = f"{platform.system()} {platform.release()}"
+    try:                                            # Linux distro pretty name
+        for line in open("/etc/os-release"):
+            if line.startswith("PRETTY_NAME="):
+                pretty = line.split("=", 1)[1].strip().strip('"')
+                osname = f"{pretty} (Linux {platform.release().split('-')[0]})"; break
+    except OSError:
+        pass
+    return f"Rendered on {cpu} · {cores} cores · {osname}"
+
+
 def settings_line(cfg, seconds):
     """Human-readable summary of the render settings actually used."""
     parts = [f"{cfg['width']}x{cfg['height']}"]
@@ -102,7 +129,8 @@ def build_index():
  h1{font-weight:600;margin:0 0 4px}
  .lead{color:#8a8f98;margin:0 0 28px;max-width:74ch}
  h2{font-weight:600;font-size:20px;margin:34px 0 2px;border-bottom:1px solid #2a2d36;padding-bottom:6px}
- .blurb{color:#8a8f98;margin:0 0 16px;max-width:74ch;font-size:14px}
+ .blurb{color:#8a8f98;margin:0 0 6px;max-width:74ch;font-size:14px}
+ .machine{color:#6b7078;margin:0 0 16px;font-size:12px;font-family:ui-monospace,monospace}
  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
  .card{background:#1e2027;border-radius:10px;overflow:hidden;box-shadow:0 2px 10px #0006}
  .card img{width:100%;display:block;background:#000;cursor:zoom-in;aspect-ratio:1/1}
@@ -117,9 +145,11 @@ def build_index():
 Kevin Brandon and resurrected in 2026. Organized by feature; every image is rendered fresh
 by the section scripts. Click any image for full size.</p>
 """]
+    machine = detect_machine()
     for s in sections:
         out.append(f'<h2>{html.escape(s["title"])}</h2>')
         if s.get("blurb"): out.append(f'<p class="blurb">{html.escape(s["blurb"])}</p>')
+        out.append(f'<p class="machine">{html.escape(machine)}</p>')
         out.append('<div class="grid">')
         for c in s["cards"]:
             out.append(f'<div class="card"><a href="{c["file"]}" target="_blank">'

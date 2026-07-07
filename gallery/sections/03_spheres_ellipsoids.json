@@ -1,0 +1,13 @@
+{
+ "order": 3,
+ "title": "Spheres & Ellipsoids",
+ "blurb": "One material idea at a time on a field of 200 objects inside a colored room: plain spheres, the same objects transformed into ellipsoids, then made reflective, then refractive glass.",
+ "cards": [
+  {
+   "file": "room-ellipsoid-progression.webp",
+   "title": "The progression, as one loop",
+   "desc": "The same 200 objects cycling through each stage - spheres, affine ellipsoids, reflective, then refractive glass. Each frame shows its own render time as it plays.",
+   "meta": "1024x1024 -> 640x640  -  4 frames (animated WebP)  -  rendered in 1 min 33 s"
+  }
+ ]
+}

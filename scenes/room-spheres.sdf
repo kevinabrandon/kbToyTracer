@@ -13,10 +13,47 @@ bgcolor      [0.15, 0.15, 0.25]
 
 begin BVH
 
-    point        (6.0, -6.0, 4.0)
-    emission     [1, 1, 1]
+  # 4 spheres lights oriented in a square above the room
+  sphere   (-3.0, -3.0, 10.0) 1
+  emission [1, 1, 1]
+  sphere   ( 3.0,  3.0, 10.0) 1
+  emission [1, 1, 1]
+  sphere   (-3.0,  3.0, 10.0) 1
+  emission [1, 1, 1]
+  sphere   ( 3.0, -3.0, 10.0) 1
+  emission [1, 1, 1]
 
+  # The floor
+  box          (-10, -6, -4) (10, 6, -3)
+  diffuse      [0.84, 0.87, 0.63]
+  specular     [1, 1, 1]
+  reflectivity 0
 
+  # the red wall in the back on the left
+  quad         (-10, 6, -3) (-10, 6, 10) (-10, -6, 10) (-10, -6, -3)
+  diffuse      [1, 0, 0]
+  specular     [1, 1, 1]
+  reflectivity 0
+
+  # the green wall in the back on the right
+  quad         (10, 6, -3) (10, 6, 10) (-10, 6, 10) (-10, 6, -3)
+  diffuse      [0, 1, 0]
+  specular     [1, 1, 1]
+  reflectivity 0
+
+  # cyan wall out of view to the left
+  quad         (-10, -6, -3) (-10, -6, 10) (10, -6, 10) (10, -6, -3)
+  diffuse      [0, 1, 1]
+  specular     [1, 1, 1]
+  reflectivity 0
+
+  # yellow wall out of view behind
+  quad         (10, -6, -3) (10, -6, 10) (10, 6, 10) (10, 6, -3)
+  diffuse      [1, 1, 0]
+  specular     [1, 1, 1]
+  reflectivity 0
+
+# beginning of ellipsoids
     sphere (-0.997497,0.127171,-0.613392) 0.261748
     diffuse [0.730256,0.661917,0.577689]
     specular [0.974660,0.982284,0.989596]

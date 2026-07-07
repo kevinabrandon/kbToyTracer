@@ -1,0 +1,25 @@
+{
+ "order": 2,
+ "title": "Soft Shadows",
+ "blurb": "Soft shadows from a spherical area light, approximated by Monte-Carlo sampling. A point light gives a hard-edged shadow; sampling an area light softens it. Watch the shadow noise vanish as the sample count climbs from 1 to 49.",
+ "cards": [
+  {
+   "file": "20-spherelight-01.png",
+   "title": "Soft Shadows - 1 sample",
+   "desc": "A spherical light softly illuminating boxes and a ball, sampled with 1x1 = 1 Monte-Carlo shadow samples per point. Very noisy with a single sample.",
+   "meta": "1024x1024  -  1 ray/pixel  -  1x1 = 1 area-light samples  -  rendered in 0.4 s"
+  },
+  {
+   "file": "20-spherelight-09.png",
+   "title": "Soft Shadows - 9 samples",
+   "desc": "A spherical light softly illuminating boxes and a ball, sampled with 3x3 = 9 Monte-Carlo shadow samples per point. Softening as samples increase.",
+   "meta": "1024x1024  -  1 ray/pixel  -  3x3 = 9 area-light samples  -  rendered in 1.8 s"
+  },
+  {
+   "file": "20-spherelight-49.png",
+   "title": "Soft Shadows - 49 samples",
+   "desc": "A spherical light softly illuminating boxes and a ball, sampled with 7x7 = 49 Monte-Carlo shadow samples per point. Smooth soft shadows.",
+   "meta": "1024x1024  -  1 ray/pixel  -  7x7 = 49 area-light samples  -  rendered in 8.6 s"
+  }
+ ]
+}

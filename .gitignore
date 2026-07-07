@@ -14,6 +14,10 @@ tools/
 assets/
 legacy/
 
+# Scratch scenes: experiment/one-off .sdf files not used by any gallery script (kept
+# locally for now, not published).
+scratch-scenes/
+
 # Loose top-level renders (the committed showcase lives in gallery/)
 /render-*.png
 /wallpaper-*.png
@@ -23,12 +27,13 @@ legacy/
 # gallery_lib.ensure_scene(); the raw .sdf stays out of the repo.
 scenes/*
 !scenes/scene1-reflection.sdf
+!scenes/scene1-sphereonly.sdf
 !scenes/scene2-matrix.sdf
-!scenes/spheres.sdf
-!scenes/ellipsoids-plain.sdf
-!scenes/ellipsoids.sdf
+!scenes/room-spheres.sdf
+!scenes/room-ellipsoids-plain.sdf
+!scenes/room-ellipsoids-reflect.sdf
+!scenes/room-ellipsoids-refract-70.sdf
 !scenes/spherelight.sdf
 !scenes/blurry.sdf
 !scenes/refract-focus.sdf
-!scenes/refract-flat.sdf
 !scenes/teapot-bvh-hq.sdf.gz

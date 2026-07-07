@@ -1,19 +1,13 @@
 {
  "order": 1,
  "title": "Class Scenes",
- "blurb": "The two milestones from the course: implementing reflection, then affine transformations, on the simple scene shown in class.",
+ "blurb": "The class scene built up one feature at a time - the progression each student worked through in EECS 204, as a single loop.",
  "cards": [
   {
-   "file": "01-reflection.png",
-   "title": "Reflection",
-   "desc": "The scene shown in class: a reflective sphere and two blocks.",
-   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 6 reflections/refractions  -  rendered in 0.9 s"
-  },
-  {
-   "file": "02-matrix.png",
-   "title": "Affine Transformation",
-   "desc": "The same scene, the sphere squashed into an ellipsoid by a 3x4 affine matrix.",
-   "meta": "1024x1024  -  3x3 anti-aliasing (9 rays/pixel)  -  up to 6 reflections/refractions  -  rendered in 1.2 s"
+   "file": "01-class-progression.webp",
+   "title": "Building the renderer, feature by feature",
+   "desc": "The order it was implemented in class: a flat sphere from the given ray tracer, then the box intersector, diffuse shading, shadows, specular highlights, reflection, and finally an affine transform turning the sphere into an ellipsoid.",
+   "meta": "640x640  -  7 frames (animated WebP)  -  3x3 AA  -  2.1 s, 0.3 s/frame"
   }
  ]
 }

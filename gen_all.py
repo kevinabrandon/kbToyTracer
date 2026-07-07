@@ -11,10 +11,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SECTIONS = ["gen_class.py", "gen_spheres_ellipsoids.py", "gen_arealights.py",
             "gen_refraction.py", "gen_teapot.py"]
 
-# Full rebuild: clear previously rendered images and section manifests first.
-for f in glob.glob(os.path.join(HERE, "gallery", "*.png")) + \
-         glob.glob(os.path.join(HERE, "gallery", "sections", "*.json")):
-    os.remove(f)
+# Full rebuild: clear previously rendered images/animations and section manifests first.
+for pat in ("gallery/*.png", "gallery/*.gif", "gallery/*.webp", "gallery/sections/*.json"):
+    for f in glob.glob(os.path.join(HERE, pat)):
+        os.remove(f)
 
 for s in SECTIONS:
     print(f"\n=== {s} ===")
