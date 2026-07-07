@@ -127,7 +127,10 @@ def build_index():
 <style>
  body{background:#15161a;color:#e6e6e6;font-family:system-ui,sans-serif;margin:0;padding:24px}
  h1{font-weight:600;margin:0 0 4px}
- .lead{color:#8a8f98;margin:0 0 28px;max-width:74ch}
+ .lead{color:#8a8f98;margin:0 0 10px;max-width:74ch}
+ .repo{margin:0 0 28px;font-size:14px}
+ .repo a{color:#6cf;text-decoration:none}
+ .repo a:hover{text-decoration:underline}
  h2{font-weight:600;font-size:20px;margin:34px 0 2px;border-bottom:1px solid #2a2d36;padding-bottom:6px}
  .blurb{color:#8a8f98;margin:0 0 6px;max-width:74ch;font-size:14px}
  .machine{color:#6b7078;margin:0 0 16px;font-size:12px;font-family:ui-monospace,monospace}
@@ -144,6 +147,7 @@ def build_index():
 <p class="lead">Rendered by James Arvo's toytracer (UC Irvine, Fall 2004), extended by
 Kevin Brandon and resurrected in 2026. Organized by feature; every image is rendered fresh
 by the section scripts. Click any image for full size.</p>
+<p class="repo"><a href="https://github.com/kevinabrandon/kbToyTracer">Source, scene files &amp; render scripts on GitHub &rarr;</a></p>
 """]
     machine = detect_machine()
     for s in sections:

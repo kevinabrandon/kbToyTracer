@@ -8,7 +8,11 @@ procedural and image textures, depth of field, a uniform spatial subdivision, an
 bounding volume hierarchy. In 2026 I recovered it from an old CD and got it building and
 rendering again on Linux.
 
-![Reflective teapot](gallery/50-teapot.png)
+<p align="center">
+  <img src="gallery/01-class-progression.webp" width="32%" alt="Building the renderer, feature by feature">
+  <img src="gallery/41-glass-morph.webp" width="32%" alt="A glass sphere morphing into a lens">
+  <img src="gallery/50-teapot.png" width="32%" alt="A reflective 229k-triangle teapot">
+</p>
 
 ## Quick start
 
