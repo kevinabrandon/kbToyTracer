@@ -8,9 +8,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
+#include <map>
+#include <string>
 #include "kbObjImport.h"
 #include "kbSmoothTriangle.h"
 #include "kbBVH.h"
+
+static bool ObjEndsWith( const std::string &s, const char *suffix )
+{
+    size_t n = strlen( suffix );
+    return s.size() >= n && s.compare( s.size() - n, n, suffix ) == 0;
+}
 
 // Parse one face-vertex token: "v", "v/vt", "v//vn" or "v/vt/vn", with
 // obj's 1-based indices (negative = relative to the end of the list so far).
@@ -46,9 +54,57 @@ static bool ParseFaceToken( const char *tok, int nv, int nt, int nn,
     return true;
 }
 
-Object *kbImportObj( const char *path )
+// Minimal .mtl reader: Kd (diffuse), Ks (specular), Ns (Phong exponent) and
+// Ke (emission -- the surface will render as a glowing emitter, but it can
+// NOT light the scene: lights are registered at scene-parse time, so add a
+// point light in the scene instead).  Everything else is ignored.
+
+static void LoadMtl( const std::string &path,
+                     std::map<std::string, Material> &mats,
+                     const Material &base )
 {
-    FILE *fp = fopen( path, "r" );
+    FILE *fp = fopen( path.c_str(), "r" );
+    if( fp == NULL )
+    {
+        std::cerr << "Warning: could not open material library " << path
+                  << " (faces keep the default material)" << std::endl;
+        return;
+    }
+    char line[1024], name[256];
+    Material *cur = NULL;
+    double r, g, b;
+    while( fgets( line, sizeof(line), fp ) != NULL )
+    {
+        if( sscanf( line, " newmtl %255s", name ) == 1 )
+        {
+            mats[ name ] = base;
+            cur = &mats[ name ];
+        }
+        else if( cur == NULL ) continue;
+        else if( sscanf( line, " Kd %lf %lf %lf", &r, &g, &b ) == 3 ) cur->diffuse  = Color( r, g, b );
+        else if( sscanf( line, " Ks %lf %lf %lf", &r, &g, &b ) == 3 ) cur->specular = Color( r, g, b );
+        else if( sscanf( line, " Ke %lf %lf %lf", &r, &g, &b ) == 3 ) cur->emission = Color( r, g, b );
+        else if( sscanf( line, " Ns %lf", &r ) == 1 )                 cur->Phong_exp = (float)r;
+    }
+    fclose( fp );
+}
+
+Object *kbImportObj( const char *path_c )
+{
+    std::string path( path_c );
+
+    // Make sure the file exists before handing it to gzip, so the error is ours.
+    FILE *probe = fopen( path_c, "r" );
+    if( probe == NULL )
+    {
+        std::cerr << "Error: Could not open obj file " << path << std::endl;
+        return NULL;
+    }
+    fclose( probe );
+
+    bool piped = ObjEndsWith( path, ".gz" );
+    FILE *fp = piped ? popen( ( "gzip -dc '" + path + "'" ).c_str(), "r" )
+                     : fopen( path_c, "r" );
     if( fp == NULL )
     {
         std::cerr << "Error: Could not open obj file " << path << std::endl;
@@ -60,20 +116,23 @@ Object *kbImportObj( const char *path )
     std::vector<Vec2> vts;  // vt lines
     long triangles = 0, skipped = 0;
 
-    // The model is pure geometry with a neutral default material; instances
-    // are expected to repaint it from the scene file.
+    // The model gets a neutral default material; an .mtl library (if the file
+    // names one) refines it per face.  An instance without material overrides
+    // inherits these per-face materials; one WITH overrides repaints uniformly.
     BVH *bvh = new BVH();
-    bvh->material.diffuse       = Color( 0.8, 0.8, 0.8 );
-    bvh->material.specular      = Color( 0.0, 0.0, 0.0 );
-    bvh->material.emission      = Color( 0.0, 0.0, 0.0 );
-    bvh->material.texture       = NULL;
-    bvh->material.reflectivity  = 0.0;
-    bvh->material.refractivity  = 0.0;
-    bvh->material.index_refract = 1.0;
-    bvh->material.Phong_exp     = 0.0;
-    bvh->material.type          = 0;
+    bvh->material.diffuse = Color( 0.8, 0.8, 0.8 );
 
-    char line[1024];
+    std::map<std::string, Material> mats;   // from mtllib
+    Material curMat = bvh->material;        // material for faces being read
+
+    // Directory of the obj file, for resolving a relative mtllib path.
+    std::string dir;
+    {
+        size_t slash = path.rfind( '/' );
+        if( slash != std::string::npos ) dir = path.substr( 0, slash + 1 );
+    }
+
+    char line[1024], name[256];
     while( fgets( line, sizeof(line), fp ) != NULL )
     {
         double x, y, z;
@@ -88,6 +147,16 @@ Object *kbImportObj( const char *path )
         else if( sscanf( line, "vt %lf %lf", &x, &y ) == 2 )
         {
             vts.push_back( Vec2( x, y ) );
+        }
+        else if( sscanf( line, " mtllib %255s", name ) == 1 )
+        {
+            LoadMtl( dir + name, mats, bvh->material );
+        }
+        else if( sscanf( line, " usemtl %255s", name ) == 1 )
+        {
+            std::map<std::string, Material>::iterator it = mats.find( name );
+            if( it != mats.end() ) curMat = it->second;
+            else                   curMat = bvh->material;
         }
         else if( line[0] == 'f' && ( line[1] == ' ' || line[1] == '\t' ) )
         {
@@ -138,14 +207,14 @@ Object *kbImportObj( const char *path )
 
                 kbSmoothTriangle *tri =
                     new kbSmoothTriangle( A, B, C, NA, NB, NC, TA, TB, TC );
-                tri->material = bvh->material;
+                tri->material = curMat;
                 bvh->AddChild( tri );
                 triangles++;
             }
         }
-        // Everything else (mtllib, usemtl, o, g, s, comments) is ignored.
+        // Everything else (o, g, s, comments) is ignored.
     }
-    fclose( fp );
+    piped ? pclose( fp ) : fclose( fp );
 
     if( triangles == 0 )
     {

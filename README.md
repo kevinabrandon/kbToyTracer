@@ -66,10 +66,14 @@ Two things worth understanding:
 - **Instancing and imports.** `define <name>` wraps an aggregate into a named prototype;
   `instance <name>` places it (any number of times — the geometry is shared, not copied),
   followed by its own transforms and material overrides. An untouched instance keeps the
-  prototype's material. `import <file> as <name>` turns another scene's geometry — a
-  `.sdf`, gzipped `.sdf.gz`, or Wavefront `.obj` (with smooth vertex normals) — into a
-  prototype the same way; the imported file's camera and lights are ignored. See
-  `tests/scenes/instancing.sdf` and `tests/scenes/import-obj.sdf` for working examples.
+  prototype's material — including per-face `.mtl` materials of imported obj models.
+  `import <file> as <name>` turns another scene's geometry — a `.sdf`, gzipped
+  `.sdf.gz`, or Wavefront `.obj`/`.obj.gz` (vertex normals → smooth shading, basic
+  `.mtl` support) — into a prototype the same way; the imported file's camera and
+  lights are ignored. `scenes/models/` ships the Cornell box, the Stanford dragon,
+  and Lucy (see its README for provenance); `scenes/cornell-box.sdf`,
+  `scenes/dragon.sdf`, `scenes/lucy.sdf` and `scenes/teapot-trio.sdf` are working
+  examples.
 - **The config** (`kbtoytracer.cfg`) holds the render *quality* settings; the scene decides
   *what* is rendered. If a scene defines a lens you get depth of field; if it has an area
   light (an emissive sphere or quad) you get soft shadows -- the config just sets the sample
@@ -87,7 +91,8 @@ Two things worth understanding:
   or composable `translate` / `rotate` / `scale` lines
 - **Instancing:** `define`/`instance` place shared geometry many times with per-instance
   transforms and materials; `import ... as` pulls in other `.sdf`(`.gz`) scenes or
-  Wavefront `.obj` meshes as instancing prototypes
+  Wavefront `.obj`(`.gz`) meshes (with basic `.mtl` materials) as instancing prototypes;
+  `scenes/models/` ships the Cornell box, Stanford dragon, and Lucy
 - **Lighting:** point lights, and **area lights** with Monte-Carlo soft shadows
 - **Textures:** image maps, procedural marble (Perlin solid noise), checker, stripe
 - **Camera:** thin-lens **depth of field** (Monte-Carlo aperture sampling)

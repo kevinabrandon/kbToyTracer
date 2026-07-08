@@ -116,6 +116,11 @@ CASES = [
      "Wavefront obj import: a quad-faced cube (fan triangulation, flat "
      "shading) and an icosphere with vertex normals (smooth kbSmoothTriangle "
      "shading, incl. under non-uniform scale), each instanced twice."),
+    ("import-mtl",             "cornell-box.sdf",              {},
+     "The Cornell box imported from OBJ with its .mtl materials: an "
+     "un-repainted instance inherits per-face materials (red/green walls, "
+     "glowing ceiling panel), pinning mtl parsing and the inherit-unless-"
+     "overridden instance semantics."),
 ]
 
 def make_scene(tag, tmpdir):

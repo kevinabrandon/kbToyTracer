@@ -1,0 +1,58 @@
+# The Stanford dragon (871k triangles, with vertex normals -> smooth
+# shading), imported gzipped from the McGuire archive conversion and
+# instanced twice from one shared BVH: gold and glass.
+#
+# The model is y-up and ~1 unit long; rotate +90 about x for z-up, then
+# scale up and sit it on the floor (base at y=-0.283 before rotation).
+
+eye          (0.0, -11.0, 4.6)
+lookat       (0.0, 0.0, 1.1)
+up           (0.0, 0.0, 1.0)
+vpdist       2.6
+
+amblight     [0.2, 0.2, 0.2]
+bgcolor      [0.15, 0.25, 0.35]
+
+import models/dragon.obj.gz as dragon
+
+begin BVH
+
+    point        (-5.0, -8.0, 12.0)
+    emission     [1, 1, 1]
+
+    point        (8.0, -3.0, 8.0)
+    emission     [0.5, 0.5, 0.5]
+
+    # the floor
+    box          (-12, -7, -1) (12, 9, 0)
+    diffuse      [0.62, 0.60, 0.55]
+    specular     [0, 0, 0]
+    reflectivity 0.08
+    Phong_exp    0
+
+    # gold
+    instance     dragon
+    rotate       (1, 0, 0) 90
+    translate    (0, 0, 0.283)
+    scale        4.2
+    rotate       (0, 0, 1) -30
+    translate    (-2.6, 1.0, 0)
+    diffuse      [0.85, 0.65, 0.2]
+    specular     [1.0, 0.9, 0.6]
+    Phong_exp    40
+    reflectivity 0.18
+
+    # glass
+    instance     dragon
+    rotate       (1, 0, 0) 90
+    translate    (0, 0, 0.283)
+    scale        4.2
+    rotate       (0, 0, 1) 25
+    translate    (2.8, -0.6, 0)
+    diffuse      [0.2, 0.35, 0.3]
+    specular     [1, 1, 1]
+    Phong_exp    40
+    refractivity 0.6
+    index_refract 1.5
+
+end

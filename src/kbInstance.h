@@ -7,10 +7,11 @@
 * rides on the enclosing aggregate's List_node, exactly like a plain       *
 * "matrix" line on any other child, so the existing inverse-ray transform  *
 * path in List/BVH does all the geometric work.  The wrapper's job is the  *
-* material: after a hit anywhere inside the (shared) prototype, the hit    *
-* is re-stamped with this instance's material, so every instance can be    *
-* shaded differently.  Note this repaints the WHOLE prototype uniformly;   *
-* per-part materials inside a prototype are flattened (v1 semantics).      *
+* material: when the scene gives an instance any material line, every hit  *
+* inside the (shared) prototype is re-stamped with the instance's own      *
+* material -- repainting the WHOLE prototype uniformly.  An instance with  *
+* no material lines inherits the prototype's per-part materials (e.g. the  *
+* red/green walls of an imported Cornell box survive instancing).          *
 *                                                                          *
 * Instances are created by the scene reader (kbReader.cpp), never from a   *
 * registered-object line, so this class is not REGISTER_OBJECT'ed.         *
@@ -26,7 +27,7 @@
 
 struct kbInstance : public Object
 {
-    kbInstance( Object *p ) : proto( p ) { material = p->material; }
+    kbInstance( Object *p ) : proto( p ), has_override( false ) { material = p->material; }
 
     virtual bool Intersect( const Ray &ray, HitInfo &hitinfo ) const
     {
@@ -34,7 +35,7 @@ struct kbInstance : public Object
         // hit, so a "true" here means the closest hit so far is inside this
         // instance -- safe to claim its shading.
         if( !proto->Intersect( ray, hitinfo ) ) return false;
-        hitinfo.material = &material;
+        if( has_override ) hitinfo.material = &material;
         return true;
     }
 
@@ -42,7 +43,9 @@ struct kbInstance : public Object
     virtual Object *ReadString( const char * ) { return NULL; }
     virtual const char *MyNameIs() const { return "Instance"; }
 
-    Object *proto;   // The shared geometry; owned by the reader's symbol table.
+    Object *proto;      // The shared geometry; owned by the reader's symbol table.
+    bool has_override;  // Set by the reader when the scene gives this instance
+                        // material lines; only then is the prototype repainted.
 };
 
 #endif

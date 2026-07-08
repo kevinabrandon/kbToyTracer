@@ -1,0 +1,27 @@
+# The Cornell box, imported from the classic OBJ (Cardenas & McGuire 2011,
+# public domain) with its .mtl materials: the untouched instance inherits
+# the red/green walls and white boxes per face.  The emissive ceiling panel
+# renders as a glowing quad but cannot light the scene (lights are scene
+# objects here), so a point light sits just below it.
+#
+# The model is y-up; rotating +90 about x makes it z-up.
+
+eye          (0.0, -3.75, 1.0)
+lookat       (0.0, 0.0, 1.0)
+up           (0.0, 0.0, 1.0)
+vpdist       2.4
+
+amblight     [0.25, 0.25, 0.25]
+bgcolor      [0, 0, 0]
+
+import models/CornellBox-Original.obj as cornellbox
+
+begin BVH
+
+    point        (0.0, 0.0, 1.8)
+    emission     [1, 1, 1]
+
+    instance     cornellbox
+    rotate       (1, 0, 0) 90
+
+end

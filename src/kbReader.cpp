@@ -45,9 +45,10 @@ bool RegisterObject( Object *obj ) // Adds each object that is registered.
 
 bool Get( const char *line, const char *name )
     {
-    // Read the given string.
+    // Read the given string.  (KB: bounded reads -- a token longer than the
+    // buffer, e.g. a long path on an import line, used to smash the stack.)
     char buff[64];
-    sscanf( line, "%s", buff );
+    if( sscanf( line, "%63s", buff ) != 1 ) return false;
     return strcmp( buff, name ) == 0;
     }
 
@@ -55,7 +56,7 @@ bool Get( const char *line, const char *name, const char *arg )
     {
     // Read the given string.
     char buff1[64], buff2[64];
-    sscanf( line, "%s %s", buff1, buff2 );
+    if( sscanf( line, "%63s %63s", buff1, buff2 ) != 2 ) return false;
     return ( strcmp( buff1, name ) == 0 ) && ( strcmp( buff2, arg ) == 0 );
     }
 
@@ -74,7 +75,8 @@ bool Get( const char *line, const char *name, Color &color )
     }
 bool Get( const char *line, const char *name, char *string )
 {
-	sprintf( format, "%s %%s", name );
+	// (KB: callers pass a 256-byte buffer; bound the read to match.)
+	sprintf( format, "%s %%255s", name );
 	return sscanf( line, format, string ) == 1;
 }
 bool Get( const char *line, const char *name, Color &color1, Color &color2, float &value )
@@ -155,6 +157,16 @@ static bool EndsWith( const std::string &s, const char *suffix )
     {
     size_t n = strlen( suffix );
     return s.size() >= n && s.compare( s.size() - n, n, suffix ) == 0;
+    }
+
+// When a material line targets an instance, remember it: only an instance
+// the scene explicitly repaints overrides its prototype's (possibly
+// per-part) materials at hit time.
+
+static void MarkInstanceOverride( Object *cur )
+    {
+    if( strcmp( cur->MyNameIs(), "Instance" ) == 0 )
+        static_cast<kbInstance*>( cur )->has_override = true;
     }
 
 // Determine whether a given line is to be regarded as blank.  This is
@@ -423,35 +435,40 @@ bool SceneReader::ReadFile( const std::string &path, bool import_mode, Object **
             return false;
             }
 
-        if( Get( input_line, "diffuse"      , c ) ) { cur->material.diffuse       = agg->material.diffuse       = c; continue; }
-        if( Get( input_line, "specular"     , c ) ) { cur->material.specular      = agg->material.specular      = c; continue; }
-        if( Get( input_line, "reflectivity" , s ) ) { cur->material.reflectivity  = agg->material.reflectivity  = s; continue; }
-        if( Get( input_line, "Phong_exp"    , s ) ) { cur->material.Phong_exp     = agg->material.Phong_exp     = s; continue; }
-		if( Get( input_line, "refractivity" , s ) ) { cur->material.refractivity  = agg->material.reflectivity  = s; continue; }
-		if( Get( input_line, "index_refract", s ) ) { cur->material.index_refract = agg->material.index_refract = s; continue; }
+        if( Get( input_line, "diffuse"      , c ) ) { cur->material.diffuse       = agg->material.diffuse       = c; MarkInstanceOverride( cur ); continue; }
+        if( Get( input_line, "specular"     , c ) ) { cur->material.specular      = agg->material.specular      = c; MarkInstanceOverride( cur ); continue; }
+        if( Get( input_line, "reflectivity" , s ) ) { cur->material.reflectivity  = agg->material.reflectivity  = s; MarkInstanceOverride( cur ); continue; }
+        if( Get( input_line, "Phong_exp"    , s ) ) { cur->material.Phong_exp     = agg->material.Phong_exp     = s; MarkInstanceOverride( cur ); continue; }
+		if( Get( input_line, "refractivity" , s ) ) { cur->material.refractivity  = agg->material.reflectivity  = s; MarkInstanceOverride( cur ); continue; }
+		if( Get( input_line, "index_refract", s ) ) { cur->material.index_refract = agg->material.index_refract = s; MarkInstanceOverride( cur ); continue; }
 		if( Get( input_line, "stripeTex", c1, c2, s ) )
 		{
 			cur->material.texture = agg->material.texture = new kbStripeTex( c1, c2, s );
+			MarkInstanceOverride( cur );
 			continue;
 		}
 		if( Get( input_line, "imageTex", str ) )
 		{
 			cur->material.texture = agg->material.texture = new kbImageTex( str );
+			MarkInstanceOverride( cur );
 			continue;
 		}
 		if( Get( input_line, "noise" ) )
 		{
 			cur->material.texture = agg->material.texture = new kbMarbleTexture( 0.3f, 5.0f, 8) ;
+			MarkInstanceOverride( cur );
 			continue;
 		}
 		if( Get( input_line, "marble", c1, c2, c3, s1, s2, s3 ) )
 		{
 			cur->material.texture = agg->material.texture = new kbMarbleTexture( c1, c2, c3, s1, s2, ( int ) s3 );
+			MarkInstanceOverride( cur );
 			continue;
 		}
 		if( Get( input_line, "checkerTex", c1, c2, s ) )
 		{
 			cur->material.texture = agg->material.texture = new kbCheckerTex( c1, c2, s );
+			MarkInstanceOverride( cur );
 			continue;
 		}
         if( Get( input_line, "emission", c ) && c != 0.0 )
@@ -473,9 +490,9 @@ bool SceneReader::ReadFile( const std::string &path, bool import_mode, Object **
                      << ", line " << line_num << " (imports cannot add lights)." << std::endl;
                 continue;
                 }
-            if( cur->IsAggregate() )
+            if( cur->IsAggregate() || strcmp( cur->MyNameIs(), "Instance" ) == 0 )
                 {
-					std::cerr << "Error: An aggregate object cannot be an emitter.  Line "
+					std::cerr << "Error: An aggregate or instance cannot be an emitter.  Line "
                      << line_num << ": "
 					 << input_line << std::endl;
                 KB_CLOSE_INPUT();
@@ -590,8 +607,9 @@ bool SceneReader::ImportFile( const std::string &importer, const std::string &ta
     {
     std::string res = ResolveRelative( importer, target );
 
-    // An obj file is pure geometry; it becomes a prototype directly.
-    if( EndsWith( res, ".obj" ) )
+    // An obj file (optionally gzipped) is pure geometry; it becomes a
+    // prototype directly.
+    if( EndsWith( res, ".obj" ) || EndsWith( res, ".obj.gz" ) )
         {
         if( alias == NULL )
             {

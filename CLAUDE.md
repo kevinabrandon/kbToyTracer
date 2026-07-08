@@ -19,10 +19,13 @@ The scene decides *what* (lights, lens, materials); kbtoytracer.cfg decides
 Scenes support instancing: `define <name>` names an aggregate as a prototype,
 `instance <name>` places it (shared geometry, per-instance transforms and
 materials), and `import <file> as <name>` makes a prototype from another
-.sdf/.sdf.gz scene (camera/lights skipped) or a Wavefront .obj mesh.
+.sdf/.sdf.gz scene (camera/lights skipped) or a Wavefront .obj/.obj.gz mesh
+(basic .mtl: Kd/Ks/Ns/Ke). An instance given material lines repaints its
+whole prototype; one without inherits the prototype's per-part materials.
 Transforms compose in reading order: `matrix`, `translate`, `rotate`, `scale`.
 Emitters are not allowed inside a define; the reader (kbReader.cpp) owns all
-of this via its SceneReader.
+of this via its SceneReader. Stock meshes (Cornell box, Stanford dragon,
+Lucy) live in scenes/models/ — see its README for provenance/licenses.
 
 ## Tests
 
@@ -31,9 +34,9 @@ of this via its SceneReader.
     python3 tests/run_tests.py --bless   # re-generate goldens (only after a
                                          # deliberate, reviewed rendering change)
 
-24 cases at 128x128 with seed=42 cover point/area lights, DoF, reflection,
+25 cases at 128x128 with seed=42 cover point/area lights, DoF, reflection,
 refraction, transparent shadows, AA modes, textures, all three aggregates,
-define/instance, and sdf/obj imports.
+define/instance, and sdf/obj/mtl imports.
 Renders must match tests/golden/ pixel-for-pixel; failures drop got/diff
 images in tests/failures/. Run this after any change to src/. Goldens are
 FP-sensitive, so bless them on the machine that runs the tests.

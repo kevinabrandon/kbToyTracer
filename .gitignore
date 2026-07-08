@@ -44,3 +44,9 @@ scenes/*
 !scenes/refract-focus.sdf
 !scenes/teapot-bvh-hq.sdf.gz
 !scenes/teapot-trio.sdf
+!scenes/cornell-box.sdf
+!scenes/dragon.sdf
+!scenes/lucy.sdf
+# Imported model library (see scenes/models/README.md for provenance)
+!scenes/models
+!scenes/models/**

@@ -1,0 +1,55 @@
+# Lucy (Stanford 3D Scanning Repository), decimated to ~100k triangles with
+# smooth vertex normals baked in, instanced twice from one shared BVH:
+# marble and bronze.
+#
+# The model is z-up but in raw scanner coordinates (millimetres, off-center):
+# the first translate re-centers it and drops its base to z=0, the scale
+# brings it to ~4.5 units tall.
+
+eye          (0.0, -13.0, 4.5)
+lookat       (0.0, 0.0, 2.0)
+up           (0.0, 0.0, 1.0)
+vpdist       2.6
+
+amblight     [0.22, 0.22, 0.22]
+bgcolor      [0.15, 0.25, 0.35]
+
+import models/lucy.obj.gz as lucy
+
+begin BVH
+
+    point        (-6.0, -10.0, 13.0)
+    emission     [1, 1, 1]
+
+    point        (7.0, -5.0, 9.0)
+    emission     [0.45, 0.45, 0.45]
+
+    # the floor
+    box          (-12, -7, -1) (12, 9, 0)
+    diffuse      [0.55, 0.55, 0.58]
+    specular     [0, 0, 0]
+    reflectivity 0.10
+    Phong_exp    0
+
+    # marble
+    instance     lucy
+    translate    (-691, 121, 606)
+    scale        0.0028
+    rotate       (0, 0, 1) 170
+    translate    (-2.2, 0.6, 0)
+    diffuse      [0.88, 0.85, 0.78]
+    specular     [1, 1, 1]
+    Phong_exp    12
+
+    # bronze
+    instance     lucy
+    translate    (-691, 121, 606)
+    scale        0.0028
+    rotate       (0, 0, 1) -170
+    translate    (2.2, 0.6, 0)
+    diffuse      [0.45, 0.28, 0.12]
+    specular     [1.0, 0.8, 0.5]
+    Phong_exp    35
+    reflectivity 0.2
+
+end
