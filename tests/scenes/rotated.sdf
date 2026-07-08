@@ -1,0 +1,44 @@
+# Affine-transform regression scene: scene1 with a matrix on the sphere
+# (squashed to an ellipsoid + rotated 10 degrees about z) and on the standing
+# block (rotated 10 degrees about z). A matrix line binds to the object above
+# it via Aggregate::Transform, so this exercises per-object transforms inside
+# whichever aggregate the test swaps in ("begin List" is replaced by the
+# runner with BVH / SSub variants).
+
+eye          (5.0,-2.0, 2.8)
+lookat       (0.0, 1.1, 0.25)
+up           (0.0, 0.0, 1.0)
+vpdist       2.75
+
+amblight     [0.2, 0.2, 0.2]
+bgcolor      [0.15, 0.25, 0.35]
+
+begin List
+
+    point        (-3.0, -4.0, 12.0)
+    emission     [1, 1, 1]
+
+    # unit sphere -> ellipsoid (y squashed to 0.6) rotated 10 deg about z
+    sphere       (0, 0, 0) 1
+    matrix       (0.98481, -0.10419, 0, 0; 0.17365, 0.59089, 0, 0; 0, 0, 1, 0)
+    diffuse      [0.96, 0.65, 0.58]
+    specular     [1.00, 0.85, 0.75]
+    reflectivity 0.40
+    Phong_exp    15
+
+    # standing block rotated 10 deg about z
+    box          (-1, 1.2, -1) (1, 2, 2)
+    matrix       (0.98481, -0.17365, 0, 0; 0.17365, 0.98481, 0, 0; 0, 0, 1, 0)
+    diffuse      [0.54, 0.53, 0.87]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+    # floor (untransformed)
+    box          (-4, -6, -2) (4, 6, -1)
+    diffuse      [0.84, 0.87, 0.63]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+end

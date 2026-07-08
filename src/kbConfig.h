@@ -1,13 +1,14 @@
 /***************************************************************************
 * kbConfig.h                                                               *
 *                                                                          *
-* Runtime render settings, loaded from a simple key/value config file.     *
-* Historically these were compile-time constants scattered through         *
-* kbTrace.cpp and kbShade.cpp; they are now gathered here so a render      *
-* can be tuned without recompiling.                                        *
+* Runtime render settings, loaded from a simple key/value config file      *
+* and/or --set key=value command-line overrides.                           *
 *                                                                          *
-* (The direct/indirect light sample counts MAX_DL_SAMP / N_IDL_SAMP remain *
-*  compile-time in kbShade.cpp because they size fixed arrays.)            *
+* Philosophy: the SCENE decides what is in the picture (lights, lens,      *
+* materials); the CONFIG decides how well it is rendered (resolution,      *
+* sample counts, bounce depth).  Features like depth of field and soft     *
+* shadows turn on automatically when the scene contains a lens or an       *
+* area light; the sample counts here control their quality (0 disables).  *
 ***************************************************************************/
 #ifndef KB_CONFIG_H
 #define KB_CONFIG_H
@@ -15,33 +16,37 @@
 struct kbConfig
 {
     // Image resolution.
-    int  width  = 320;
-    int  height = 240;
+    int  width  = 512;
+    int  height = 512;
 
-    // Anti-aliasing (kbTrace.cpp).
-    bool enable_supersample      = true;
-    bool enable_stochastic_super = false;   // jittered supersampling
-    bool enable_adaptive_super   = false;
-    int  numSampsLarge           = 2;       // NxN samples per pixel
-    int  numSampsSmall           = 2;
+    // Anti-aliasing: aa_samples x aa_samples rays per pixel (1 = single ray).
+    int  aa_samples   = 2;
+    bool aa_jitter    = false;   // jitter the AA grid (stochastic supersampling)
+    bool aa_adaptive  = false;   // corner-sample first, refine only busy pixels
+    double aa_threshold = 0.01;  // corner-difference that triggers refinement
 
-    // Depth of field (thin lens); aperture/focus come from the scene file.
-    bool enable_camera_lens     = false;
-    int  lensSamps              = 6;        // NxN rays through the aperture
+    // Depth of field: dof_samples x dof_samples lens rays per AA sample.
+    // Active only when the scene defines a lens; 0 disables DoF entirely.
+    int  dof_samples  = 3;
+
+    // Soft shadows: shadow_samples x shadow_samples rays per area light.
+    // Point lights always use a single shadow ray; 1 = hard shadows.
+    int  shadow_samples = 3;
 
     // Ray tree.
-    int  numBounces             = 6;        // max reflection/refraction depth
+    int  max_bounces  = 6;       // max reflection/refraction depth
 
     // When a secondary (reflection/refraction) ray escapes the scene, return the
     // background color instead of black. The class-era shader did this; the later
     // GI work switched to black. true reproduces the original 2004/5 look.
-    bool bg_escaped_rays        = false;
+    bool bg_escaped_rays = false;
 
-    // Area-light Monte-Carlo sampling: dlSamp x dlSamp shadow samples per light
-    // (1,4,9,16,... total). Only used when enable_area_light is on. Max 8 (see MAX_DL_SAMP).
-    int  dlSamp                 = 3;
+    // Random seed for all Monte-Carlo sampling (jitter, lens, soft shadows).
+    // 0 = seed from the system (every render different); any other value gives
+    // reproducible renders -- essential for flicker-free animation frames.
+    unsigned seed = 0;
 
-    // Shading toggles (kbShade.cpp).
+    // Feature kill-switches (normally all on; useful for debugging/teaching).
     bool enable_shading         = true;
     bool enable_specular        = true;
     bool enable_shadows         = true;
@@ -50,15 +55,18 @@ struct kbConfig
     bool enable_transparent_shadows = false;
     bool enable_reflection      = true;
     bool enable_refraction      = true;
-    bool enable_indirect_light  = false;
-    bool enable_stratify_light  = false;
-    bool enable_area_light      = false;
+    bool enable_indirect_light  = false;  // experimental GI
+    bool enable_stratify_light  = false;  // experimental GI
 
     // Console output (render progress etc.).
     bool display_messages       = true;
 
-    // Load overrides from a config file. Returns false if it can't be opened
-    // (in which case the defaults above are used).
+    // Set a single "key value" setting. Returns false for unknown keys.
+    bool Set( const char *key, const char *val );
+
+    // Load settings from a config file (one "key value" per line, '#' for
+    // comments). Returns false if the file can't be opened (in which case
+    // the defaults above are used).
     bool Load( const char *path );
 };
 

@@ -39,8 +39,8 @@ def render_stage(scene, over, ambient, tag):
     if ambient is not None:
         text = re.sub(r'amblight\s+\[[^\]]*\]', f'amblight [{ambient}, {ambient}, {ambient}]', text)
     open(f"/tmp/class_{tag}.sdf", "w").write(text)
-    cfg = dict(width=SIZE, height=SIZE, enable_supersample=1, numSampsLarge=3,
-               numBounces=6, enable_refraction=0)
+    cfg = dict(width=SIZE, height=SIZE, aa_samples=3,
+               max_bounces=6, enable_refraction=0)
     cfg.update(over)
     open(f"/tmp/class_{tag}.cfg", "w").write("".join(f"{k} {v}\n" for k, v in cfg.items()))
     subprocess.run([BIN, f"/tmp/class_{tag}.sdf", f"/tmp/class_{tag}.ppm", f"/tmp/class_{tag}.cfg"],

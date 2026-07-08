@@ -18,13 +18,13 @@
 #include "toytracer.h"
 #include "kbConfig.h"
 #include <stdlib.h>
+#include <string.h>
+#include <vector>
 
 
-// Direct/indirect light sample counts. These size fixed-length arrays below,
-// so they remain compile-time constants (change here + recompile). All other
-// shading toggles are runtime settings in Config (see kbConfig.h).
-#define MAX_DL_SAMP 8    // max area-light sample grid dim (sizes a fixed array); actual count = Config.dlSamp
-// number of indirect light samples
+// Indirect (GI) light sample count. It sizes a fixed-length array below, so
+// it remains a compile-time constant (change here + recompile). All other
+// shading knobs are runtime settings in Config (see kbConfig.h).
 #define N_IDL_SAMP 1
 
 // samples the projected hemisphere
@@ -94,15 +94,16 @@ Color Shade( const HitInfo &hit, const Scene &scene, int max_tree_depth )
 		}
 		else
 		{
-			if(Config.enable_area_light)
+			// The scene decides the light type: a Point emitter gets the analytic
+			// single-ray path (with specular); an emitter with actual area (sphere,
+			// quad, ...) gets Monte-Carlo soft shadows at Config.shadow_samples^2.
+			if( strcmp( light->MyNameIs(), "Point" ) == 0 || Config.shadow_samples < 1 )
 			{
-				// we only look at the direct light source
-				color += DirectLight(hit, scene, *light, movedPoint, max_tree_depth) / scene.num_lights;
-			}	
+				color += PointLightShade( hit, scene, *light, movedPoint, max_tree_depth) / scene.num_lights;
+			}
 			else
 			{
-				// we only look at the point light source
-				color += PointLightShade( hit, scene, *light, movedPoint, max_tree_depth) / scene.num_lights;
+				color += DirectLight(hit, scene, *light, movedPoint, max_tree_depth) / scene.num_lights;
 			}
 		}
 	}
@@ -173,12 +174,14 @@ Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, 
 
 	Color color;
 
-	// The array of samples that will be passed to GetSamples
-	int dl = Config.dlSamp; if( dl < 1 ) dl = 1; if( dl > MAX_DL_SAMP ) dl = MAX_DL_SAMP;
-	Sample samples[MAX_DL_SAMP * MAX_DL_SAMP];
+	// The array of samples that will be passed to GetSamples. The light says
+	// how many samples it actually produced (a Point light returns just one).
+	int dl = Config.shadow_samples; if( dl < 1 ) dl = 1;
+	std::vector<Sample> samples( dl * dl );
 
-	light.GetSamples(hit.point, hit.normal, samples, dl);
-	
+	int got = light.GetSamples(hit.point, hit.normal, samples.data(), dl);
+	if( got < 1 ) return color;
+
 	// irad is the irradance at the point P.  To find the irradiance we will
 	// use a monte carlo sampling method.  Irradiance will equal the avarage
 	// of the cosine of the angle between each sample and the normal times the 
@@ -188,7 +191,7 @@ Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, 
 	// L = 1 / TwoPi 
 	double irad = 0;
 	
-	for(int i = 0; i < dl*dl; i++)
+	for(int i = 0; i < got; i++)
 	{
 		// Direction to this light sample, and its geometric (cosine) term.
 		Vec3 lightPos = samples[i].P;
@@ -237,9 +240,29 @@ Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, 
 	// at this point irad is simply a sum of all the cosines to each
 	// unobstructed sample we need to devide it by the total number
 	// of samples to make it an avarage (and to get irradance)
-	irad = irad / (double)(dl*dl);
+	irad = irad / (double)got;
 
-	color = hit.object->material.diffuse * irad;
+	// Texture-aware diffuse (same rule as the point-light path).
+	Color diff = ( hit.object->material.texture == NULL )
+		? hit.object->material.diffuse
+		: hit.object->material.texture->GetColorFromUV( hit.uv, hit.point );
+	color = diff * irad;
+
+	// Phong specular highlight, mirroring PointLightShade() so highlights
+	// don't vanish just because a light has area: aim at the light's center.
+	if( Config.enable_specular && hit.ray.type != inside_ray
+	    && hit.object->material.Phong_exp != 0 )
+	{
+		Vec3 direcToCenter = Unit( light.GetBounds().Center() - hit.point );
+		Vec3 viewDirec     = Unit( hit.point - hit.ray.origin );
+		Vec3 reflectDirec  = Unit( viewDirec - ( 2 * hit.normal ) * ( viewDirec * hit.normal ) );
+		float RL = (float)( reflectDirec * direcToCenter );
+		if( RL > 0 )
+		{
+			float specWeight = pow( RL, hit.object->material.Phong_exp );
+			color = ( specWeight * hit.object->material.specular ) + ( ( 1 - specWeight ) * color );
+		}
+	}
 
 	return color;
 }
@@ -256,13 +279,9 @@ int SampleProjectedHemisphere(const Vec3 &P, const Vec3 &N, Sample *samples, con
 	{
 		for(int j = 0; j < n; j++)
 		{
-			double rand1 = rand();
-			rand1 = rand1 / RAND_MAX;
-			rand1 = ( i + rand1) / n;	// stratify samples
-
-			double rand2 = rand();
-			rand2 = rand2 / RAND_MAX;
-			rand2 = ( j + rand2) / n;	// stratify samples
+			// stratified samples (rand(a,b) is the thread-safe generator)
+			double rand1 = ( i + rand( 0.0, 1.0 ) ) / n;
+			double rand2 = ( j + rand( 0.0, 1.0 ) ) / n;
 
 			double x = sqrt(rand1) * cos(TwoPi * rand2);
 			double y = sqrt(rand1) * sin(TwoPi * rand2);

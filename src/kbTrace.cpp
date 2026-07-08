@@ -17,6 +17,8 @@
 #include "toytracer.h"
 #include "Image.h"
 #include "kbConfig.h"
+#include "kbRandom.h"
+#include "kbPng.h"
 #include <chrono>
 
 
@@ -120,6 +122,13 @@ bool MakeImage( const Camera &cam, const Lens &lens, const Scene &scene, int xre
 
 	auto liStart = std::chrono::high_resolution_clock::now();
 
+	// The scene decides WHAT is rendered, the config decides HOW WELL:
+	// depth of field activates simply because the scene defined a lens
+	// (dof_samples = 0 turns it off; it also controls the quality).
+	const bool useDof = ( lens.lensRadius > 0 && lens.focalDist > 0 && Config.dof_samples > 0 );
+	const int  aa     = ( Config.aa_samples < 1 ) ? 1 : Config.aa_samples;
+	const int  nl     = useDof ? Config.dof_samples : 1;
+
 	// Render rows in parallel. Each row is an independent unit of work; "ray" is
 	// firstprivate so every thread gets its own scratch copy (origin/type already
 	// set) rather than racing on a shared one. "dynamic" scheduling load-balances
@@ -127,63 +136,68 @@ bool MakeImage( const Camera &cam, const Lens &lens, const Scene &scene, int xre
 	#pragma omp parallel for schedule(dynamic) firstprivate(ray)
 	for( int i = 0; i < yres; i++ )
 	{
+		// With a fixed seed, each row's random stream is deterministic no matter
+		// which thread renders it -- renders become reproducible run-to-run.
+		if( Config.seed != 0 ) kbReseed( (unsigned)i );
+
 		for( int j = 0; j < xres; j++ )
 		{
-			if ( Config.enable_adaptive_super )
+			if ( Config.aa_adaptive )
 			{
-				I(i,j) = ToneMap ( AdaptiveSuper( i, j, dU, dR, O, ray, scene, 0.01, true ) );
+				I(i,j) = ToneMap ( AdaptiveSuper( i, j, dU, dR, O, ray, scene, Config.aa_threshold, true ) );
+				continue;
 			}
-			else if( Config.enable_supersample )
+
+			// One unified sampling loop: an aa x aa grid over the pixel
+			// (optionally jittered), and -- when the scene has a lens -- an
+			// nl x nl spread of rays through the aperture for each grid cell.
+			Color color( 0, 0, 0 );
+			for(int k = 0; k < aa; k++)
 			{
-				Color color( 0, 0, 0 );
-				for(int k = 0; k < Config.numSampsLarge; k++)
+				for(int l = 0; l < aa; l++)
 				{
-					for(int l = 0; l < Config.numSampsLarge; l++)
+					if( aa == 1 && !Config.aa_jitter )
 					{
-						if ( Config.enable_stochastic_super )
+						ray.direction = Unit( O + j * dR - i * dU );
+					}
+					else if ( Config.aa_jitter )
+					{
+						double x = rand( 0, 1 );
+						double y = rand( 0, 1 );
+						ray.direction = Unit( ( O + j * dR - i * dU ) + ( (k + x) * ( dR / aa ) ) - ( ( l + y ) * (dU / aa ) ) );
+					}
+					else
+					{
+						// uniform supersampling
+						ray.direction = Unit( ( O + j * dR - i * dU ) + ( k * ( dR / aa ) ) - ( l * (dU / aa ) ) );
+					}
+
+					if( useDof )
+					{
+						// Thin-lens model: every ray through the aperture converges
+						// on this AA sample's point in the focal plane.
+						Vec3 focalPoint = cam.eye + lens.focalDist * ray.direction;
+						for( int a = 0; a < nl * nl; a++ )
 						{
-							double x = rand( 0, 1 );
-							double y = rand( 0, 1 );
-							ray.direction = Unit( ( O + j * dR - i * dU ) + ( (k + x) * ( dR / Config.numSampsLarge ) ) - ( ( l + y ) * (dU / Config.numSampsLarge ) ) );
-							color = color + Trace( ray, scene, Config.numBounces );
-						}
-						else
-						{
-							// uniform supersampling
-							ray.direction = Unit( ( O + j * dR - i * dU ) + ( k * ( dR / Config.numSampsLarge ) ) - ( l * (dU / Config.numSampsLarge ) ) );
-							color = color + Trace( ray, scene, Config.numBounces );
+							// Uniform sample on the aperture disk.
+							double r     = lens.lensRadius * sqrt( rand( 0, 1 ) );
+							double theta = rand( 0, TwoPi );
+							Ray lensRay;
+							lensRay.type      = primary_ray;
+							lensRay.origin    = cam.eye + U * ( r * cos( theta ) ) + R * ( r * sin( theta ) );
+							lensRay.direction = Unit( focalPoint - lensRay.origin );
+							color += Trace( lensRay, scene, Config.max_bounces );
 						}
 					}
-				}
-				color = color / ( Config.numSampsLarge * Config.numSampsLarge );
-				I(i,j) = ToneMap( color );
-			}
-			else if( Config.enable_camera_lens && lens.lensRadius )
-			{
-				Color pixColor( 0.0, 0.0, 0.0 );
-				for( int k = 0; k < Config.lensSamps; k++ )
-				{
-					for( int l = 0; l < Config.lensSamps; l++ )
+					else
 					{
-						Vec3 pointOnFocalPlane = cam.eye + ( lens.focalDist * Unit( O + j * dR - i * dU  ) + ( k * ( dR / Config.numSampsLarge ) ) - ( l * (dU / Config.numSampsLarge ) ) );
-						double x = rand( -lens.lensRadius, lens.lensRadius );
-						double y = rand( -lens.lensRadius, lens.lensRadius );
-						Ray lensRay;
-						lensRay.origin = cam.eye + U * x + R * y;
-						lensRay.direction = Unit(pointOnFocalPlane - lensRay.origin ); 
-						pixColor += Trace( lensRay, scene, Config.numBounces );		
+						color += Trace( ray, scene, Config.max_bounces );
 					}
 				}
-				
-				I(i,j) = ToneMap( pixColor / ( Config.lensSamps * Config.lensSamps ) );
 			}
-			else
-			{
-				ray.direction = Unit( O + j * dR - i * dU  );
-				I(i,j) = ToneMap( Trace( ray, scene, Config.numBounces ) );
-			}
+			I(i,j) = ToneMap( color / ( aa * aa * nl * nl ) );
 		}
-		if( Config.display_messages && i % 10 == 0 ) { printf( "\r\t%6.2f%c Complete", ( ( i / ( double ) smallRes ) * 100.0 ), '%' ); fflush( stdout ); }
+		if( Config.display_messages && i % 10 == 0 ) { printf( "\r\t%6.2f%c Complete", ( ( i / ( double ) yres ) * 100.0 ), '%' ); fflush( stdout ); }
 	}
 
 	if( Config.display_messages )	
@@ -202,35 +216,22 @@ bool MakeImage( const Camera &cam, const Lens &lens, const Scene &scene, int xre
 		std::cout << "Number of rays casted: " << NumberOfRays << std::endl;
 	}
 
-	// Save the image to a file.
-    if( !I.Write( fname ) )
+	// Save the image to a file (.png or .ppm, by extension).
+    if( !kbWriteImage( I, fname ) )
 	{
-		printf( "Could not save file!\n" );	
-	} 
+		printf( "Could not save file!\n" );
+	}
     
 	return true;
     }
 
 Color AdaptiveSuper(int i, int j, Vec3 dU, Vec3 dR, Vec3 O, Ray ray, const Scene &scene, double thr, bool first)
 {
-	Color average;
 	if ( first )
 	{
-		// this is the first call to AdaptiveSuper()
-		// send four rays through corners of pixel
-	
-		/*
-		Color color[ Config.numSampsSmall * Config.numSampsSmall ];
-		Color sum(0, 0, 0);
-		for( int k = 0; k < Config.numSampsSmall; k++ )
-		{
-			for( int l = 0; l < Config.numSampsSmall; l++ )
-			{
-				ray.direction = Unit( ( O + j * dR - i * dU ) + ( k * ( dR / Config.numSampsSmall ) ) - ( l * (dU / Config.numSampsSmall ) ) );
-				sum += color[  l + Config.numSampsSmall * k ] = Trace ( ray, scene, Config.numBounces );
-			}
-		}
-		*/
+		// Pre-pass: send four rays through the corners of the pixel. If they
+		// all agree (within thr) the pixel is smooth and their average will
+		// do; otherwise refine with the full aa_samples x aa_samples grid.
 		Color color[ 4 ];
 		Color sum( 0, 0, 0 );
 		for( int k = 0; k < 2; k++ )
@@ -238,58 +239,35 @@ Color AdaptiveSuper(int i, int j, Vec3 dU, Vec3 dR, Vec3 O, Ray ray, const Scene
 			for (int l = 0; l < 2; l++ )
 			{
 				ray.direction = Unit ( O + ( j + k ) * dR - ( i + l ) * dU );
-				sum += color[ 2 * k + l ] = Trace( ray, scene, Config.numBounces );
+				sum += color[ 2 * k + l ] = Trace( ray, scene, Config.max_bounces );
 			}
 		}
+		Color average = sum / 4;
 
-		//ray.direction = Unit( O + j * dR - i * dU - dR / 2 + dU / 2 );
-		//sum += color [ 4 ] = Trace( ray, scene, Config.numBounces );
-		/*
-		ray.direction = Unit( O + j * dR - i * dU  );
-		sum += color[ 0 ] = Trace( ray, scene, Config.numBounces );
-		ray.direction = Unit( O + ( j + 1 ) * dR - i * dU ) ;
-		sum += color[ 1 ] = Trace( ray, scene, Config.numBounces );
-		ray.direction = Unit( O + j * dR - ( i + 1 ) * dU );
-		sum += color[ 2 ] = Trace( ray, scene, Config.numBounces );
-		ray.direction = Unit( O + ( j + 1 ) * dR - (i + 1) * dU );
-		sum += color[ 3 ] = Trace( ray, scene, Config.numBounces ); 
-		*/
-		average = sum / 4;
-		
-		bool diff = false;
 		for ( int n = 0; n < 4; n++ )
 		{
 			if ( !CompareColor( color[ n ], average, thr ) )
 			{
-				// the four samples are not close enough... we need to get more
-				// recursively call AdaptiveSuper
+				// A corner disagrees with the average: this pixel spans an
+				// edge or highlight, so refine it with the full sample grid.
 				return AdaptiveSuper( i, j, dU, dR, O, ray, scene, thr, false );
-
-			}
-			else
-			{
-				// The 4 samples are sufficent
-				return average;
 			}
 		}
-
+		return average;   // all four corners agree; the pixel is smooth
 	}
-	else
+
+	// Refinement: a full uniform aa_samples x aa_samples grid over the pixel.
+	int aa = ( Config.aa_samples < 2 ) ? 2 : Config.aa_samples;
+	Color sum( 0, 0, 0 );
+	for(int k = 0; k < aa; k++)
 	{
-		// this is the recursive call
-		Color sum( 0, 0, 0 );
-		for(int k = 0; k < Config.numSampsLarge; k++)
+		for(int l = 0; l < aa; l++)
 		{
-			for(int l = 0; l < Config.numSampsLarge; l++)
-			{
-				// uniform supersampling
-				ray.direction = Unit( ( O + j * dR - i * dU ) + ( k * ( dR / Config.numSampsLarge ) ) - ( l * (dU / Config.numSampsLarge ) ) );
-				sum += Trace( ray, scene, Config.numBounces );
-			}
+			ray.direction = Unit( ( O + j * dR - i * dU ) + ( k * ( dR / aa ) ) - ( l * (dU / aa ) ) );
+			sum += Trace( ray, scene, Config.max_bounces );
 		}
-		average = sum / ( Config.numSampsLarge * Config.numSampsLarge );
 	}
-	return average;
+	return sum / ( aa * aa );
 }
 
 bool CompareColor( const Color &A, const Color &B, const double thr )

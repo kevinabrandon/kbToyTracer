@@ -1,0 +1,48 @@
+# Texture regression scene: checker, stripe, and marble spheres over a
+# diffuse floor, lit by one point light. Textures live on spheres because
+# spheres carry uv coordinates.
+
+eye          (5.0,-2.0, 2.8)
+lookat       (0.0, 1.1, 0.25)
+up           (0.0, 0.0, 1.0)
+vpdist       2.75
+
+amblight     [0.2, 0.2, 0.2]
+bgcolor      [0.15, 0.25, 0.35]
+
+begin List
+
+    point        (-3.0, -4.0, 12.0)
+    emission     [1, 1, 1]
+
+    # floor (declared BEFORE the textured spheres: material settings are
+    # sticky in the scene format, and a texture can't be un-set, so anything
+    # after the marble sphere would inherit its texture)
+    quad         (-8, -8, -0.4) (8, -8, -0.4) (8, 8, -0.4) (-8, 8, -0.4)
+    diffuse      [0.6, 0.65, 0.55]
+    Phong_exp    0
+    reflectivity 0
+
+    # checkerboard sphere
+    sphere       (-1.2, 0.5, 0.6) 0.9
+    diffuse      [1, 1, 1]
+    checkerTex   [0.9, 0.1, 0.1] [0.95, 0.95, 0.95] 8
+    specular     [1, 1, 1]
+    Phong_exp    20
+    reflectivity 0
+
+    # striped sphere
+    sphere       (1.4, 1.2, 0.6) 0.9
+    diffuse      [1, 1, 1]
+    stripeTex    [0.1, 0.2, 0.8] [0.95, 0.9, 0.2] 10
+    Phong_exp    0
+    reflectivity 0
+
+    # marble sphere
+    sphere       (0.2, 2.6, 0.8) 1.1
+    diffuse      [1, 1, 1]
+    marble       [1, 0.78, 0.6] [1, 0.666, 0.396] [1, 0.5, 0.1] 0.3 5.0 8
+    Phong_exp    12
+    reflectivity 0
+
+end

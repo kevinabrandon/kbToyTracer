@@ -2,22 +2,21 @@
 """Section 2: soft shadows - the SphereLight scene at increasing sample counts.
 
 A point light gives hard shadows; an area light gives soft shadows, approximated by
-Monte-Carlo sampling the light. More samples -> less noise. This sweeps dlSamp = 1..7,
+Monte-Carlo sampling the light. More samples -> less noise. This sweeps shadow_samples,
 i.e. 1, 4, 9, 16, 25, 36, 49 shadow samples per point.
 """
 from gallery_lib import render, settings_line, write_section, build_index
 
-SAMPLE_GRID = [1, 3, 7]   # dlSamp; total samples = 1, 9, 49
+SAMPLE_GRID = [1, 3, 7]   # shadow_samples; total samples = 1, 9, 49
 
-CFG = dict(enable_supersample=0, enable_camera_lens=0, enable_area_light=1,
-           enable_reflection=0, enable_refraction=0, numBounces=2)
+CFG = dict(aa_samples=1, enable_reflection=0, enable_refraction=0, max_bounces=2)
 
 if __name__ == "__main__":
     cards = []
     for n in SAMPLE_GRID:
         total = n * n
         out = f"20-spherelight-{total:02d}.png"
-        r = render(out, "spherelight.sdf", dict(CFG, dlSamp=n))
+        r = render(out, "spherelight.sdf", dict(CFG, shadow_samples=n))
         cards.append(dict(
             file=out,
             title=f"Soft Shadows - {total} sample{'s' if total != 1 else ''}",

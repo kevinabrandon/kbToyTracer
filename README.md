@@ -28,10 +28,13 @@ understand what the tracer does and how it's driven.
 To render a single scene yourself:
 
 ```sh
-./kbtoytracer scenes/scene1-reflection.sdf out.ppm kbtoytracer.cfg
+./kbtoytracer scenes/scene1-reflection.sdf              # writes scene1-reflection.png
+./kbtoytracer scenes/blurry.sdf --preview               # fast low-quality draft
+./kbtoytracer scenes/blurry.sdf --set width=1920 --set aa_samples=4
 ```
 
-The arguments are `<scene.sdf> [output.ppm] [config.cfg]`.
+The arguments are `<scene.sdf> [output.png|.ppm] [config.cfg]`, plus `--set key=value`
+overrides and `--preview` for a fast draft. Output is PNG or PPM by extension.
 
 ## Learning the tracer by reading the gallery scripts
 
@@ -59,10 +62,12 @@ Two things worth understanding:
   by its material (`diffuse`, `specular`, `reflectivity`, `refractivity`, `index_refract`,
   `Phong_exp`, `emission`) and optional `matrix` (a 3×4 affine transform) or texture. Open
   `scenes/scene1-reflection.sdf` — it's a dozen readable lines.
-- **The config** (`kbtoytracer.cfg`) holds the render settings the scene doesn't:
-  resolution, anti-aliasing samples, max reflection/refraction depth, area-light sample
-  count (`dlSamp`), depth-of-field lens sampling, and feature toggles. The gallery scripts
-  write a fresh config per image, so you can see each setting's effect in isolation.
+- **The config** (`kbtoytracer.cfg`) holds the render *quality* settings; the scene decides
+  *what* is rendered. If a scene defines a lens you get depth of field; if it has an area
+  light (an emissive sphere or quad) you get soft shadows -- the config just sets the sample
+  counts (`aa_samples`, `dof_samples`, `shadow_samples`), resolution, bounce depth (`max_bounces`),
+  and a `seed` for reproducible renders. The gallery scripts write a fresh config per image,
+  so you can see each setting's effect in isolation.
 
 ## Features
 
@@ -76,6 +81,9 @@ Two things worth understanding:
 - **Acceleration:** a **bounding volume hierarchy** (`begin BVH`, median split) and a uniform
   spatial subdivision (`begin SSub`), alongside brute-force `begin List`
 - **Parallel:** the render loop is parallelized with OpenMP
+- **Output:** PNG (dependency-free encoder) or PPM, chosen by file extension
+- **Reproducible:** a config `seed` fixes all Monte-Carlo sampling -- byte-identical
+  renders run-to-run, flicker-free animation frames
 
 ## Notes
 

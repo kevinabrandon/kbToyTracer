@@ -157,13 +157,11 @@ int Sphere::GetSamples( const Vec3 &P, const Vec3 &N, Sample *samples, int n ) c
 	{
 		for(int j = 0; j < n; j++)
 		{
-			// first random vriable
-			double x = rand();	
-			x = x / RAND_MAX;	// make x between 0 and 1
+			// first random variable (rand(a,b) is the thread-safe, seedable generator)
+			double x = rand( 0.0, 1.0 );
 			if(enable_strat)	x = (i + x) / n;	// if enable_strat is true x will be limited to the box at (i, j)
-			
-			double y = rand();
-			y = y / RAND_MAX;	// make y between 0 and 1
+
+			double y = rand( 0.0, 1.0 );
 			if(enable_strat)	y = (j + y) / n;	// if enable_strat is true y will be limited to the box at (i, j)
 
 			// for explination of names of variables see answer to #4 of Homework 3

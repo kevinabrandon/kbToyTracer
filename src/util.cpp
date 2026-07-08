@@ -9,16 +9,9 @@
 *                                                                          *
 ***************************************************************************/
 #include "toytracer.h"
-#include <random>
 
-// (KB: rewritten with a per-thread generator so parallel OpenMP rendering
-//  is race-free and each thread is decorrelated.)
-double rand( double a, double b )
-    {
-    static thread_local std::mt19937 gen( std::random_device{}() );
-    std::uniform_real_distribution<double> dist( a, b );
-    return dist( gen );
-    }
+// (KB: Arvo's rand() definition moved to kbRandom.cpp, which provides a
+//  per-thread, seedable generator for race-free parallel rendering.)
 
 Interval &Interval::operator+=( const Interval &A )
     {

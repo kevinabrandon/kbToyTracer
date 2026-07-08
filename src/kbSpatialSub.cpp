@@ -8,6 +8,7 @@
 
 #include "kbSpatialSub.h"
 #include <chrono>
+#include <stdio.h>
 
 Voxel::Voxel()
 {
@@ -266,7 +267,11 @@ int SpatialSub::ListOfVoxelsOnRay(const Ray &ray, int *list) const
 
 void SpatialSub::Transform( const Mat3x4 &mat )
 {
-	// no transforming yet...
+	// Never implemented (2004), and SpatialSub is now kept as a historical
+	// exhibit -- use BVH for anything real. Warn instead of silently
+	// rendering the untransformed object.
+	fprintf( stderr, "WARNING: SSub does not support 'matrix' transforms; "
+	                 "the matrix is ignored. Use 'begin BVH' or 'begin List'.\n" );
 }
 
 Object *SpatialSub::ReadString( const char *params )

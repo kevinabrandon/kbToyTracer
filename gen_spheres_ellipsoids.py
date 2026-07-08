@@ -19,13 +19,13 @@ except Exception:
 # render time this machine actually took, baked in as the loop plays.
 ENTRIES = [
   ("room-spheres.png", "room-spheres.sdf",
-   dict(enable_reflection=0, enable_refraction=0, numBounces=1), "1 - 200 spheres"),
+   dict(enable_reflection=0, enable_refraction=0, max_bounces=1), "1 - 200 spheres"),
   ("room-ellipsoids-plain.png", "room-ellipsoids-plain.sdf",
-   dict(enable_reflection=0, enable_refraction=0, numBounces=1), "2 - affine ellipsoids"),
+   dict(enable_reflection=0, enable_refraction=0, max_bounces=1), "2 - affine ellipsoids"),
   ("room-ellipsoids-reflect.png", "room-ellipsoids-reflect.sdf",
-   dict(enable_reflection=1, enable_refraction=0, numBounces=8), "3 - reflective (0.55)"),
+   dict(enable_reflection=1, enable_refraction=0, max_bounces=8), "3 - reflective (0.55)"),
   ("room-ellipsoids-refract-70.png", "room-ellipsoids-refract-70.sdf",
-   dict(enable_reflection=0, enable_refraction=1, numBounces=8), "4 - refractive (0.70)"),
+   dict(enable_reflection=0, enable_refraction=1, max_bounces=8), "4 - refractive (0.70)"),
 ]
 
 def caption(im, text, size=640):

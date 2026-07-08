@@ -35,8 +35,8 @@ def render_dof_rack(out, size=480, samps=10):
         keyidx.append(len(focals) - 1)
     base = open(os.path.join(SCENES, "blurry.sdf")).read().replace("\r", "")
     texts = [re.sub(r'focalDist\s+[\d.]+', f'focalDist {fd:.4f}', base) for fd in focals]
-    cfg = (f"width {size}\nheight {size}\nenable_supersample 0\nenable_camera_lens 1\n"
-           f"lensSamps {samps}\nenable_reflection 1\nenable_refraction 1\nenable_shadows 1\nnumBounces 8\n")
+    cfg = (f"width {size}\nheight {size}\naa_samples 1\ndof_samples {samps}\nshadow_samples 0\n"
+           f"enable_reflection 1\nenable_refraction 1\nenable_shadows 1\nmax_bounces 8\n")
     frames, secs = _render_frames(texts, cfg, "rack")
     N = len(frames); order = list(range(N)) + list(range(N - 2, 0, -1))   # ping-pong
     dur = [550 if order[p] in set(keyidx) else 110 for p in range(len(order))]  # dwell at P1/P2/P3
@@ -65,8 +65,8 @@ def render_morph(out, size=480, nframes=32, samps=2, bounces=8):
         rows = [f"{M[r,0]:.6f}, {M[r,1]:.6f}, {M[r,2]:.6f}, {center[r]:.6f}" for r in range(3)]
         obj = "\t\tsphere\t\t(0,0,0) 1\n\t\tmatrix ( " + "; ".join(rows) + " )"
         texts.append(base.replace(old, obj))
-    cfg = (f"width {size}\nheight {size}\nenable_supersample 1\nnumSampsLarge {samps}\n"
-           f"enable_camera_lens 0\nenable_reflection 1\nenable_refraction 1\nenable_shadows 1\nnumBounces {bounces}\n")
+    cfg = (f"width {size}\nheight {size}\naa_samples {samps}\ndof_samples 0\nshadow_samples 0\n"
+           f"enable_reflection 1\nenable_refraction 1\nenable_shadows 1\nmax_bounces {bounces}\n")
     frames, secs = _render_frames(texts, cfg, "morph")
     N = len(frames); order = list(range(N)) + list(range(N - 2, 0, -1))
     dur = [900 if order[p] in (0, N - 1) else 70 for p in range(len(order))]   # hold the sphere & the lens

@@ -20,10 +20,13 @@ SIZE     = 1024
 THREADS  = "4"
 
 # Baseline render config; each entry overrides what it needs.
-BASE = dict(width=SIZE, height=SIZE, enable_supersample=1, enable_shadows=1,
-            enable_reflection=1, enable_refraction=1, enable_area_light=0,
-            numBounces=6, numSampsLarge=3, dlSamp=3, bg_escaped_rays=1,
-            enable_camera_lens=0, lensSamps=10)
+# shadow_samples=0 / dof_samples=0 pin the classic point-light / no-DoF look
+# for reproducibility (several gallery scenes use small sphere emitters and
+# lenses, which the tracer now picks up automatically); sections that want
+# soft shadows or depth of field override these explicitly.
+BASE = dict(width=SIZE, height=SIZE, aa_samples=3, max_bounces=6,
+            enable_shadows=1, enable_reflection=1, enable_refraction=1,
+            bg_escaped_rays=1, shadow_samples=0, dof_samples=0)
 
 os.makedirs(GALLERY, exist_ok=True)
 os.makedirs(SECTIONS, exist_ok=True)
@@ -63,16 +66,16 @@ def detect_machine():
 def settings_line(cfg, seconds):
     """Human-readable summary of the render settings actually used."""
     parts = [f"{cfg['width']}x{cfg['height']}"]
-    if cfg["enable_camera_lens"]:
-        n = cfg["lensSamps"]; parts.append(f"{n}x{n} lens samples (depth of field)")
-    elif cfg["enable_supersample"]:
-        n = cfg["numSampsLarge"]; parts.append(f"{n}x{n} anti-aliasing ({n*n} rays/pixel)")
+    if cfg.get("dof_samples"):
+        n = cfg["dof_samples"]; parts.append(f"{n}x{n} lens samples (depth of field)")
+    elif cfg.get("aa_samples", 1) > 1:
+        n = cfg["aa_samples"]; parts.append(f"{n}x{n} anti-aliasing ({n*n} rays/pixel)")
     else:
         parts.append("1 ray/pixel")
-    if cfg["enable_area_light"]:
-        n = cfg["dlSamp"]; parts.append(f"{n}x{n} = {n*n} area-light samples")
-    if cfg["enable_reflection"] or cfg["enable_refraction"]:
-        parts.append(f"up to {cfg['numBounces']} reflections/refractions")
+    if cfg.get("shadow_samples"):
+        n = cfg["shadow_samples"]; parts.append(f"{n}x{n} = {n*n} area-light samples")
+    if cfg.get("enable_reflection") or cfg.get("enable_refraction"):
+        parts.append(f"up to {cfg['max_bounces']} reflections/refractions")
     parts.append(f"rendered in {fmt_time(seconds)}")
     return "  -  ".join(parts)
 

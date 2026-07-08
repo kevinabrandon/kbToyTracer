@@ -7,13 +7,13 @@
    "file": "40-depth-of-field-rack.webp",
    "title": "Depth of Field - focus rack",
    "desc": "A thin-lens camera racking focus through the scene: from a soft foreground, onto the refractive glass sphere, then onto the reflective sphere and box behind it.",
-   "meta": "480x480  -  17 frames (animated WebP)  -  10x10 lens samples/pixel  -  2 min 55 s, 10.3 s/frame"
+   "meta": "480x480  -  17 frames (animated WebP)  -  10x10 lens samples/pixel  -  3 min 4 s, 10.9 s/frame"
   },
   {
    "file": "41-glass-morph.webp",
    "title": "Sphere to Lens (animated)",
    "desc": "A blue glass sphere flattened into a camera-facing lens by ramping its affine matrix. Refraction through a transformed primitive, tumbling through an edge-on view.",
-   "meta": "480x480  -  32 frames (animated WebP)  -  2x2 AA  -  38.9 s, 1.2 s/frame"
+   "meta": "480x480  -  32 frames (animated WebP)  -  2x2 AA  -  41.3 s, 1.3 s/frame"
   }
  ]
 }

@@ -1,3 +1,6 @@
+# Personal/machine-specific Claude instructions (CLAUDE.md itself is shared)
+CLAUDE.local.md
+
 # Build artifacts and render outputs
 *.o
 *.obj
@@ -9,7 +12,8 @@ build/
 __pycache__/
 *.pyc
 
-# Tooling and assets not needed to run the gallery (kept locally, not published here)
+# Tooling and assets not needed to run the gallery (kept locally, not published
+# here)
 tools/
 assets/
 legacy/
@@ -19,8 +23,8 @@ legacy/
 scratch-scenes/
 
 # Loose top-level renders (the committed showcase lives in gallery/)
-/render-*.png
-/wallpaper-*.png
+/*.png
+scenes/*.png
 
 # Scenes: publish only the ones the gallery uses. The 229k-triangle teapot ships
 # gzipped (scenes/teapot-bvh-hq.sdf.gz) and is decompressed on demand by

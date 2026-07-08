@@ -7,7 +7,7 @@
    "file": "room-ellipsoid-progression.webp",
    "title": "The progression, as one loop",
    "desc": "The same 200 objects cycling through each stage - spheres, affine ellipsoids, reflective, then refractive glass. Each frame shows its own render time as it plays.",
-   "meta": "1024x1024 -> 640x640  -  4 frames (animated WebP)  -  rendered in 1 min 33 s"
+   "meta": "1024x1024 -> 640x640  -  4 frames (animated WebP)  -  rendered in 1 min 32 s"
   }
  ]
 }

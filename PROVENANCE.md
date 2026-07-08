@@ -37,6 +37,7 @@ Byte-faithful to the archive except for C++17 portability fixes
 `kbMain.cpp` (CLI, 2026), `kbTrace.cpp` (render loop: supersampling, adaptive/stochastic AA,
 thin-lens DoF, OpenMP), `kbShade.cpp` (shader: refraction, area lights, indirect light),
 `kbReader.cpp` (scene parser with textures/refraction), `kbConfig.*` (runtime settings, 2026),
+`kbRandom.*` (seedable per-thread RNG, 2026), `kbPng.*` (dependency-free PNG writer, 2026),
 `kbBVH.*`, `kbSpatialSub.*`, `kbPlane.cpp`, `kbList.h`, `kbBox.h`,
 `kbTexture.h` + `kbCheckerTex.h`, `kbStripeTex.h`, `kbDefaultTex.h`, `kbMarbleTex.*`,
 `kbImageTex.*`, and `kbSolidNoise.*` (Perlin-style noise after Shirley & Morley).
@@ -45,3 +46,22 @@ The three heavily-extended files were named `shade1.cpp`, `reader1.cpp`, and
 `toytracer1.cpp` in the 2004/5 sources; they were renamed `kbShade.cpp`, `kbReader.cpp`,
 and `kbTrace.cpp` in 2026. `legacy/` holds their superseded Win32-era class versions,
 unmodified.
+
+`kbSpatialSub` (the `begin SSub` aggregate) is a 2004 homework solution kept as a
+historical exhibit: of the acceleration structures offered in the assignment it
+sounded like the easiest to program, and it rendered the required 200-ellipsoid
+scene. 2026 benchmarks show it does real work on big scenes -- the 229k-triangle
+teapot renders ~38x faster through SSub than through the brute-force List (5 s
+vs 3.2 min at 64x64) -- but its fixed overhead (a 12^3 grid tested box-by-box
+per ray, no DDA traversal, no mailboxing) means that on scenes of a few hundred
+objects it actually loses to the linear scan, and the BVH beats it everywhere
+(~65x on the teapot). So it is frozen as-is: it does not support `matrix`
+transforms (it warns if you try) and new features are not added to it. Use
+`begin BVH`.
+
+## Third-party
+
+`src/stb_image_write.h` — Sean Barrett's single-header image writer
+(github.com/nothings/stb), dual-licensed public domain / MIT (see the file's
+footer). Used by `kbPng.cpp` for compressed PNG output when present; without
+it the build falls back to kbPng's own uncompressed encoder.
