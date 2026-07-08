@@ -1,13 +1,13 @@
 {
  "order": 1,
- "title": "Class Scenes",
- "blurb": "The class scene built up one feature at a time - the progression each student worked through in EECS 204, as a single loop.",
+ "title": "Feature Progression",
+ "blurb": "The renderer built up one feature at a time, as a single loop: stages 1-8 are the progression worked through in EECS 204; stages 9 and beyond were added later.",
  "cards": [
   {
    "file": "01-class-progression.webp",
    "title": "Building the renderer, feature by feature",
-   "desc": "The order it was implemented in class: a flat sphere from the given ray tracer, then the box intersector, diffuse shading, shadows, specular highlights, reflection, and finally an affine transform turning the sphere into an ellipsoid.",
-   "meta": "640x640  -  7 frames (animated WebP)  -  3x3 AA  -  2.1 s, 0.3 s/frame"
+   "desc": "Stages 1-8 are the class work, in the order it was implemented: a flat sphere from the given ray tracer, then the box and quad intersectors (raising the blocks and a colored room: red in back, green right, cyan left, yellow behind the camera), diffuse shading, shadows, specular highlights, reflection, an affine transform turning the sphere into an ellipsoid, and a spherical light with soft shadows. Stages 9 and up were added later: the ellipsoid re-ground as 70% glass, checkerboards on the floor (40% reflective) and the box, and finally marble everywhere: pink on the ellipsoid, purple on the box, and olive on the floor (ellipsoid and floor at a subtle 5% reflectivity).",
+   "meta": "640x640  -  11 frames (animated WebP)  -  3x3 AA  -  4x4 soft-shadow samples on the later frames  -  33.8 s, 3.1 s/frame"
   }
  ]
 }

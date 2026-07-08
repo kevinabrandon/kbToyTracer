@@ -33,6 +33,13 @@ scenes/*
 !scenes/scene1-reflection.sdf
 !scenes/scene1-sphereonly.sdf
 !scenes/scene2-matrix.sdf
+!scenes/scene1-reflection-room.sdf
+!scenes/scene2-matrix-room.sdf
+!scenes/scene3-spherelight.sdf
+!scenes/scene4-refraction.sdf
+!scenes/scene5-checker-floor.sdf
+!scenes/scene6-marble.sdf
+!scenes/scene7-dof.sdf
 !scenes/room-spheres.sdf
 !scenes/room-ellipsoids-plain.sdf
 !scenes/room-ellipsoids-reflect.sdf

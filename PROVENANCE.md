@@ -21,7 +21,7 @@ Byte-faithful to the archive except for C++17 portability fixes
 | `triangle.cpp` | one marked change: normal flipped to match kbToyTracer's winding convention |
 | `quad.cpp` | marked changes: normal flipped, `uv` defaulted |
 | `util.cpp` | marked change: `rand()` rewritten thread-local so OpenMP rendering is race-free (2026) |
-| `box.cpp` | all Arvo code; KB restructuring only (declarations moved to `kbBox.h`, Arvo's handout ray-box intersector merged in) |
+| `box.cpp` | KB restructuring (declarations moved to `kbBox.h`, Arvo's handout ray-box intersector merged in); one marked change: planar face `uv` coords for texturing (2026) |
 
 ## Mixed files (Arvo skeleton, KB extensions — see each header's `Provenance:` note)
 
