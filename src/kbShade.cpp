@@ -227,10 +227,14 @@ Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, 
 		}
 		else
 		{
-			// Original hard shadow: any non-light blocker fully occludes the sample.
+			// Original hard shadow: any non-light blocker fully occludes the
+			// sample.  Bound the ray at the sample point -- with Infinity,
+			// geometry BEYOND the light also "blocked" it, which put enclosed
+			// scenes (e.g. a Cornell box, ceiling right behind the panel)
+			// entirely in shadow.
 			HitInfo junkInfo;
 			junkInfo.ignore = &light;
-			junkInfo.distance = Infinity;
+			junkInfo.distance = Length(lightPos - toLight.origin);
 			if(Cast(toLight, scene, junkInfo)) transmittance = 0.0;
 		}
 
@@ -259,8 +263,13 @@ Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, 
 		float RL = (float)( reflectDirec * direcToCenter );
 		if( RL > 0 )
 		{
+			// Additive Phong: the highlight rides on top of the shading.
+			// (The old lerp toward the specular color *replaced* the diffuse
+			// under the lobe, so a specular DIMMER than the surface -- e.g.
+			// an mtl with Ns set but Ks black -- darkened it into a fake
+			// round "shadow" instead of a highlight.)
 			float specWeight = pow( RL, hit.Mtl().Phong_exp );
-			color = ( specWeight * hit.Mtl().specular ) + ( ( 1 - specWeight ) * color );
+			color += specWeight * hit.Mtl().specular;
 		}
 	}
 
@@ -391,13 +400,15 @@ Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &lig
 				// R is the reflection direction and L is the direction of the light source
 				// RL is R dot L (normalized)
 				float RL = (float)((reflectDirec * direcToLight) / (Length(direcToLight) * Length(reflectDirec))); 
-				if(RL > 0) 
+				if(RL > 0)
 				{
 					// specWeight is how much we should weight the specular color of the object
 					float specWeight = pow(RL, hit.Mtl().Phong_exp);
-			
-					// here we linearly interpolate between the specular color and the current color		
-					color =  (( specWeight * hit.Mtl().specular) + ((1 - specWeight) * color));	
+
+					// Additive Phong (see DirectLight): the old lerp replaced the
+					// diffuse under the lobe and turned dim/black speculars into
+					// dark blotches.
+					color += specWeight * hit.Mtl().specular;
 				}
 			}		
 		}	
