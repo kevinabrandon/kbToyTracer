@@ -1,0 +1,32 @@
+# A standalone model file: an octahedral "gem" of eight triangles (yellow,
+# shiny).  It carries its own camera settings and even a light so it can be
+# rendered by itself -- an importer must skip the camera lines and refuse
+# the light (with warnings), taking only the geometry.
+
+eye          (0.0, -5.0, 1.0)
+lookat       (0.0, 0.0, 0.0)
+up           (0.0, 0.0, 1.0)
+vpdist       2.0
+bgcolor      [0.1, 0.1, 0.1]
+
+begin BVH
+
+    # set on the aggregate first so every triangle inherits it
+    diffuse      [0.9, 0.85, 0.25]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    20
+
+    point        (-2.0, -4.0, 6.0)
+    emission     [1, 1, 1]
+
+    triangle ( 1, 0, 0) ( 0, 1, 0) ( 0, 0, 1)
+    triangle ( 0, 1, 0) (-1, 0, 0) ( 0, 0, 1)
+    triangle (-1, 0, 0) ( 0,-1, 0) ( 0, 0, 1)
+    triangle ( 0,-1, 0) ( 1, 0, 0) ( 0, 0, 1)
+    triangle ( 0, 1, 0) ( 1, 0, 0) ( 0, 0,-1)
+    triangle (-1, 0, 0) ( 0, 1, 0) ( 0, 0,-1)
+    triangle ( 0,-1, 0) (-1, 0, 0) ( 0, 0,-1)
+    triangle ( 1, 0, 0) ( 0,-1, 0) ( 0, 0,-1)
+
+end

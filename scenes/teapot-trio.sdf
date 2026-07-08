@@ -1,0 +1,66 @@
+# Three Utah teapots, one set of triangles.
+#
+# Demonstrates the instancing/import features: the 229k-triangle teapot is
+# imported once, straight from the gzipped scene file (its camera and lights
+# are ignored), then placed three times with composed transforms and
+# per-instance materials -- copper, chrome, and glass.  The geometry and its
+# BVH are shared by all three instances.
+#
+# The SPD model carries its own 8x8 floor of quads at z=0, so each instance
+# is sunk 0.05 below this scene's floor top (z=-0.02) to hide its copy.
+
+eye          (0.0, -17.5, 8.0)
+lookat       (0.0, 0.0, 1.2)
+up           (0.0, 0.0, 1.0)
+vpdist       2.6
+
+amblight     [0.2, 0.2, 0.2]
+bgcolor      [0.15, 0.25, 0.35]
+
+import teapot-bvh-hq.sdf.gz as teapot
+
+begin BVH
+
+    point        (-6.0, -10.0, 14.0)
+    emission     [1, 1, 1]
+
+    point        (10.0, -4.0, 10.0)
+    emission     [0.6, 0.6, 0.6]
+
+    # the floor
+    box          (-14, -9, -1) (14, 11, -0.02)
+    diffuse      [0.62, 0.60, 0.55]
+    specular     [0, 0, 0]
+    reflectivity 0.08
+    Phong_exp    0
+
+    # copper
+    instance     teapot
+    rotate       (0, 0, 1) 35
+    translate    (-6.6, 1.2, -0.05)
+    diffuse      [0.80, 0.42, 0.18]
+    specular     [1.0, 0.75, 0.55]
+    Phong_exp    30
+    reflectivity 0.15
+
+    # chrome, a little larger
+    instance     teapot
+    scale        1.15
+    rotate       (0, 0, 1) -20
+    translate    (0.2, 2.4, -0.05)
+    diffuse      [0.22, 0.26, 0.30]
+    specular     [1, 1, 1]
+    Phong_exp    60
+    reflectivity 0.55
+
+    # glass
+    instance     teapot
+    rotate       (0, 0, 1) 145
+    translate    (6.6, 0.4, -0.05)
+    diffuse      [0.15, 0.30, 0.20]
+    specular     [1, 1, 1]
+    Phong_exp    40
+    refractivity 0.65
+    index_refract 1.5
+
+end

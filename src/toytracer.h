@@ -60,6 +60,11 @@ struct Ray {            // A ray in R3.
     };
 
 struct Material {       // Surface material for shading.
+    // (KB: everything zeroed explicitly.  This struct used to rely on lucky
+    // fresh-heap zeroes: an aggregate created mid-parse -- e.g. an imported
+    // model -- could hand its children a garbage texture pointer.)
+    Material() : texture(0), reflectivity(0), refractivity(0),
+                 index_refract(1), Phong_exp(0), type(0) {}
     Color diffuse;      // Diffuse color.
     Color specular;     // Color of highlights.
     Color emission;     // Emitted light.
@@ -80,6 +85,11 @@ struct HitInfo {          // Records all info at ray-object intersection.
     Vec3    normal;       // The surface normal at the point of intersection.
     Ray     ray;          // The ray that hit the surface.
 	Vec2    uv;           // uv coordinates for 2d textures
+    const Material *material = 0; // Material to shade with: the hit object's
+                          // own, unless an instance wrapper (kbInstance)
+                          // overrides it so shared geometry can be shaded
+                          // with a per-instance material.
+    const Material &Mtl() const;  // material if set, else object->material.
     };
 
 struct Camera {         // Defines the position of the camera.
@@ -140,6 +150,11 @@ struct Object {         // The base class for all objects that can be ray traced
     Object  *parent;    // Useful for nesting objects within aggregates.
     Object  *next;      // Used by toytracer to link registered objects.
     };
+
+inline const Material &HitInfo::Mtl() const
+    {
+    return material != 0 ? *material : object->material;
+    }
 
 struct Scene {
     Color ambient;              // Ambient light (from all directions).

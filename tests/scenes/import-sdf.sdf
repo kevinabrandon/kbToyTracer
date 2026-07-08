@@ -1,0 +1,44 @@
+# sdf-import regression scene: pulls the octahedral gem out of a standalone
+# model file (which has its own camera lines and a light -- both must be
+# ignored with warnings) and places it three times: raised untouched (keeps
+# the model's yellow), squashed red, and stretched reflective blue.
+
+eye          (0.0, -7.0, 2.5)
+lookat       (0.0, 0.0, 0.5)
+up           (0.0, 0.0, 1.0)
+vpdist       2.5
+
+amblight     [0.2, 0.2, 0.2]
+bgcolor      [0.15, 0.25, 0.35]
+
+import models/gem.sdf as gem
+
+begin BVH
+
+    point        (-3.0, -6.0, 10.0)
+    emission     [1, 1, 1]
+
+    # the floor
+    box          (-7, -4, -1) (7, 6, 0)
+    diffuse      [0.7, 0.7, 0.6]
+    specular     [0, 0, 0]
+    reflectivity 0
+    Phong_exp    0
+
+    # untouched: keeps the model file's yellow
+    instance     gem
+    translate    (0, 0, 1.6)
+
+    instance     gem
+    scale        (1.2, 1.2, 0.5)
+    translate    (-2.6, 0, 0.5)
+    diffuse      [0.9, 0.25, 0.2]
+
+    instance     gem
+    rotate       (0, 0, 1) 45
+    scale        (0.8, 0.8, 1.6)
+    translate    (2.6, 0, 1.6)
+    diffuse      [0.2, 0.4, 0.9]
+    reflectivity 0.35
+
+end

@@ -95,6 +95,7 @@ bool List::Intersect( const Ray &ray, HitInfo &hitinfo ) const
 					// transform the normal to the "original domain"
 					hitinfo.normal =  Unit(Inverse(Transpose(node->matrix .mat)) * tempHitInfo.normal );
 					hitinfo.object = tempHitInfo.object;
+					hitinfo.material = tempHitInfo.material;
 					hitinfo.uv = tempHitInfo.uv;
 	
 					found_a_hit = true;	

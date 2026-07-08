@@ -52,7 +52,7 @@ thread_local Color diffuse;   // per-thread scratch (was a shared global — a d
 Color Shade( const HitInfo &hit, const Scene &scene, int max_tree_depth )
 {
 	// Keep the following line.  Emitters need not be shaded.
-	if( hit.object->material.Emitter() ) 
+	if( hit.Mtl().Emitter() ) 
 	{
 		if( ( hit.ray.type == 3 && Config.enable_stratify_light) )
 		{
@@ -63,7 +63,7 @@ Color Shade( const HitInfo &hit, const Scene &scene, int max_tree_depth )
 			return Color( 1, 1, 1 );
 		}
 		
-		return hit.object->material.emission / Pi;
+		return hit.Mtl().emission / Pi;
 	}
 
 	Color color( 0.0, 0.0, 0.0 );
@@ -120,9 +120,9 @@ Color Shade( const HitInfo &hit, const Scene &scene, int max_tree_depth )
 	// recursion (a bright bloom in dense glass). Placing it here leaves opaque and purely
 	// reflective scenes unchanged. (Use THIS surface's own diffuse; the shared 'diffuse'
 	// scratch may have been clobbered by the recursive reflection shading above.)
-	Color ambDiffuse = ( hit.object->material.texture == NULL )
-		? hit.object->material.diffuse
-		: hit.object->material.texture->GetColorFromUV( hit.uv, hit.point );
+	Color ambDiffuse = ( hit.Mtl().texture == NULL )
+		? hit.Mtl().diffuse
+		: hit.Mtl().texture->GetColorFromUV( hit.uv, hit.point );
 	color += ambDiffuse * scene.ambient;
 
 	if( Config.enable_refraction ) color = GetRefraction( hit, scene, color, max_tree_depth );
@@ -163,7 +163,7 @@ Color IndirectLight( const HitInfo &hit, const Scene &scene, const Object &light
 	// (only if the samples are of the *projected* hemisphere)
 	Color irad = Pi * ( radiance / ( N_IDL_SAMP * N_IDL_SAMP ) );
 	
-	Color color = hit.object->material.diffuse * irad;
+	Color color = hit.Mtl().diffuse * irad;
 
 	return color;
 
@@ -218,8 +218,8 @@ Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, 
 				info.ignore = &light;                               // don't shadow on the light itself
 				info.distance = Length(lightPos - toLight.origin);  // only occluders before the sample
 				if(!Cast(toLight, scene, info)) break;              // clear path to the light
-				if(info.object->material.Emitter()) break;          // reached an emitter
-				double refr = info.object->material.refractivity;
+				if(info.Mtl().Emitter()) break;          // reached an emitter
+				double refr = info.Mtl().refractivity;
 				if(refr <= 0.0) { transmittance = 0.0; break; }     // opaque -> full shadow
 				transmittance *= refr;                              // glass -> partial pass
 				toLight.origin = info.point + direcToLight * 0.001; // step past this surface
@@ -227,10 +227,14 @@ Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, 
 		}
 		else
 		{
-			// Original hard shadow: any non-light blocker fully occludes the sample.
+			// Original hard shadow: any non-light blocker fully occludes the
+			// sample.  Bound the ray at the sample point -- with Infinity,
+			// geometry BEYOND the light also "blocked" it, which put enclosed
+			// scenes (e.g. a Cornell box, ceiling right behind the panel)
+			// entirely in shadow.
 			HitInfo junkInfo;
 			junkInfo.ignore = &light;
-			junkInfo.distance = Infinity;
+			junkInfo.distance = Length(lightPos - toLight.origin);
 			if(Cast(toLight, scene, junkInfo)) transmittance = 0.0;
 		}
 
@@ -243,15 +247,15 @@ Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, 
 	irad = irad / (double)got;
 
 	// Texture-aware diffuse (same rule as the point-light path).
-	Color diff = ( hit.object->material.texture == NULL )
-		? hit.object->material.diffuse
-		: hit.object->material.texture->GetColorFromUV( hit.uv, hit.point );
+	Color diff = ( hit.Mtl().texture == NULL )
+		? hit.Mtl().diffuse
+		: hit.Mtl().texture->GetColorFromUV( hit.uv, hit.point );
 	color = diff * irad;
 
 	// Phong specular highlight, mirroring PointLightShade() so highlights
 	// don't vanish just because a light has area: aim at the light's center.
 	if( Config.enable_specular && hit.ray.type != inside_ray
-	    && hit.object->material.Phong_exp != 0 )
+	    && hit.Mtl().Phong_exp != 0 )
 	{
 		Vec3 direcToCenter = Unit( light.GetBounds().Center() - hit.point );
 		Vec3 viewDirec     = Unit( hit.point - hit.ray.origin );
@@ -259,8 +263,13 @@ Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, 
 		float RL = (float)( reflectDirec * direcToCenter );
 		if( RL > 0 )
 		{
-			float specWeight = pow( RL, hit.object->material.Phong_exp );
-			color = ( specWeight * hit.object->material.specular ) + ( ( 1 - specWeight ) * color );
+			// Additive Phong: the highlight rides on top of the shading.
+			// (The old lerp toward the specular color *replaced* the diffuse
+			// under the lobe, so a specular DIMMER than the surface -- e.g.
+			// an mtl with Ns set but Ks black -- darkened it into a fake
+			// round "shadow" instead of a highlight.)
+			float specWeight = pow( RL, hit.Mtl().Phong_exp );
+			color += specWeight * hit.Mtl().specular;
 		}
 	}
 
@@ -307,13 +316,13 @@ Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &lig
 	Color color;
 	Color black(0,0,0);
 	
-	if( hit.object->material.texture == NULL )
+	if( hit.Mtl().texture == NULL )
 	{
-		diffuse = hit.object->material.diffuse;
+		diffuse = hit.Mtl().diffuse;
 	}
 	else
 	{
-		diffuse = hit.object->material.texture->GetColorFromUV( hit.uv, hit.point );
+		diffuse = hit.Mtl().texture->GetColorFromUV( hit.uv, hit.point );
 	}
 
 	// here we find direction vector of the reflection.
@@ -364,8 +373,8 @@ Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &lig
 					info.ignore = NULL;
 					info.distance = Length(lightPos - toLight.origin);
 					if( !Cast(toLight, scene, info) ) break;			// clear path to light
-					if( info.object->material.Emitter() ) break;		// reached the light
-					double refr = info.object->material.refractivity;
+					if( info.Mtl().Emitter() ) break;		// reached the light
+					double refr = info.Mtl().refractivity;
 					if( refr <= 0.0 ) { transmittance = 0.0; break; }	// opaque -> full shadow
 					transmittance *= refr;								// glass -> partial pass
 					toLight.origin = info.point + direcToLight * 0.001;	// step past this surface
@@ -379,25 +388,27 @@ Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &lig
 				info.ignore = NULL;
 				info.distance = Length(lightPos - hit.point);
 				if( Cast(toLight, scene, info) )
-					if( !info.object->material.Emitter() )	color = black;
+					if( !info.Mtl().Emitter() )	color = black;
 			}
 		}
 	
 		if(Config.enable_specular)
 		{
 			// here we find the specular highlight
-			if(hit.object->material.Phong_exp != 0)
+			if(hit.Mtl().Phong_exp != 0)
 			{
 				// R is the reflection direction and L is the direction of the light source
 				// RL is R dot L (normalized)
 				float RL = (float)((reflectDirec * direcToLight) / (Length(direcToLight) * Length(reflectDirec))); 
-				if(RL > 0) 
+				if(RL > 0)
 				{
 					// specWeight is how much we should weight the specular color of the object
-					float specWeight = pow(RL, hit.object->material.Phong_exp);
-			
-					// here we linearly interpolate between the specular color and the current color		
-					color =  (( specWeight * hit.object->material.specular) + ((1 - specWeight) * color));	
+					float specWeight = pow(RL, hit.Mtl().Phong_exp);
+
+					// Additive Phong (see DirectLight): the old lerp replaced the
+					// diffuse under the lobe and turned dim/black speculars into
+					// dark blotches.
+					color += specWeight * hit.Mtl().specular;
 				}
 			}		
 		}	
@@ -406,7 +417,7 @@ Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &lig
 		if(Config.enable_reflection)
 		{
 			// here we add reflection
-			if( hit.object->material.reflectivity > 0 )
+			if( hit.Mtl().reflectivity > 0 )
 			{
 				Ray reflectRay;
 				Color reflectColor;
@@ -417,7 +428,7 @@ Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &lig
 					// recursivly call Trace to find what color would be seen from the ray reflecRay
 					reflectColor = Trace(reflectRay, scene, max_tree_depth );
 					// here we linearly interpolate between the reflection and the color of the object without reflection
-					color = ( hit.object->material.reflectivity  * reflectColor ) + (( 1 - hit.object->material.reflectivity )* color);
+					color = ( hit.Mtl().reflectivity  * reflectColor ) + (( 1 - hit.Mtl().reflectivity )* color);
 				}
 			}
 		}
@@ -426,7 +437,7 @@ Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &lig
 	/*
 	if( Config.enable_refraction)
 	{
-		if( hit.object->material.refractivity > 0 )
+		if( hit.Mtl().refractivity > 0 )
 		{
 			float n;
 			Vec3 normal;
@@ -434,14 +445,14 @@ Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &lig
 			Color refractColor;
 			if( hit.ray.type != inside_ray )	
 			{
-				n = 1 / hit.object->material.index_refract;
+				n = 1 / hit.Mtl().index_refract;
 				refractRay.origin = hit.point + (hit.normal * -0.001);
 				refractRay.type = inside_ray;
 				normal = hit.normal;
 			}
 			else
 			{
-				n = hit.object->material.index_refract;
+				n = hit.Mtl().index_refract;
 				refractRay.origin = hit.point + (hit.normal * 0.001);
 				refractRay.type = generic_ray;
 				normal = -hit.normal;
@@ -456,7 +467,7 @@ Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &lig
 				refractColor = Trace( refractRay, scene, max_tree_depth );
 				if( hit.ray.type == inside_ray ) return refractColor;
 			}
-			color = ( hit.object->material.refractivity * refractColor ) + ( ( 1 - hit.object->material.refractivity ) * color );
+			color = ( hit.Mtl().refractivity * refractColor ) + ( ( 1 - hit.Mtl().refractivity ) * color );
 		}
 	}
 	*/
@@ -467,7 +478,7 @@ Color GetSpecular( const HitInfo &hit, const Scene &scene, const Object &light, 
 {
 	Color color;
 
-	if(hit.object->material.Phong_exp != 0)
+	if(hit.Mtl().Phong_exp != 0)
 	{	
 		Vec3 viewDirec = Unit(hit.point - hit.ray.origin);
 		Vec3 reflectDirec = Unit(viewDirec - ( 2 * hit.normal) * (viewDirec * hit.normal));
@@ -478,10 +489,10 @@ Color GetSpecular( const HitInfo &hit, const Scene &scene, const Object &light, 
 		if(RL > 0) 
 		{
 			// specWeight is how much we should weight the specular color of the object
-			float specWeight = pow(RL, hit.object->material.Phong_exp);
+			float specWeight = pow(RL, hit.Mtl().Phong_exp);
 	
 			// here we linearly interpolate between the specular color and the current color		
-			color =  (( specWeight * hit.object->material.specular) + ((1 - specWeight) * origColor ));	
+			color =  (( specWeight * hit.Mtl().specular) + ((1 - specWeight) * origColor ));	
 		}
 	}
 	else return origColor;
@@ -494,7 +505,7 @@ Color GetRefraction( const HitInfo &hit, const Scene &scene, const Color origCol
 {
 	Color color = origColor;
 
-	if( hit.object->material.refractivity > 0 )
+	if( hit.Mtl().refractivity > 0 )
 	{
 		float n;
 		Vec3 normal;
@@ -502,14 +513,14 @@ Color GetRefraction( const HitInfo &hit, const Scene &scene, const Color origCol
 		Color refractColor;
 		if( hit.ray.type != inside_ray )	
 		{
-			n = 1 / hit.object->material.index_refract;
+			n = 1 / hit.Mtl().index_refract;
 			refractRay.origin = hit.point + (hit.normal * -0.001);
 			refractRay.type = inside_ray;
 			normal = hit.normal;
 		}
 		else
 		{
-			n = hit.object->material.index_refract;
+			n = hit.Mtl().index_refract;
 			refractRay.origin = hit.point + (hit.normal * 0.001);
 			refractRay.type = generic_ray;
 			normal = -hit.normal;
@@ -524,7 +535,7 @@ Color GetRefraction( const HitInfo &hit, const Scene &scene, const Color origCol
 			refractColor = Trace( refractRay, scene, max_tree_depth );
 			if( refractColor == origColor ) return origColor;
 			if( hit.ray.type == inside_ray ) return refractColor;
-			color = ( hit.object->material.refractivity * refractColor ) + ( ( 1 - hit.object->material.refractivity ) * color );
+			color = ( hit.Mtl().refractivity * refractColor ) + ( ( 1 - hit.Mtl().refractivity ) * color );
 		}
 		else
 		{
@@ -533,7 +544,7 @@ Color GetRefraction( const HitInfo &hit, const Scene &scene, const Color origCol
 			refractRay.type = inside_ray;
 			refractColor = Trace( refractRay, scene, max_tree_depth );
 			if( hit.ray.type == inside_ray ) return refractColor;
-			color = ( hit.object->material.refractivity * refractColor ) + ( ( 1 - hit.object->material.refractivity ) * color );
+			color = ( hit.Mtl().refractivity * refractColor ) + ( ( 1 - hit.Mtl().refractivity ) * color );
 		}
 	}
 	return color;
@@ -544,7 +555,7 @@ Color GetReflection( const HitInfo &hit, const Scene &scene, const Color origCol
 	Color color;
 
 	// here we add reflection
-	if( hit.object->material.reflectivity > 0 )
+	if( hit.Mtl().reflectivity > 0 )
 	{
 		Ray reflectRay;
 		Vec3 viewDirec = Unit(hit.point - hit.ray.origin);
@@ -555,7 +566,7 @@ Color GetReflection( const HitInfo &hit, const Scene &scene, const Color origCol
 			// recursivly call Trace to find what color would be seen from the ray reflecRay
 			Color reflectColor = Trace(reflectRay, scene, max_tree_depth );
 			// here we linearly interpolate between the reflection and the color of the object without reflection
-			color = ( hit.object->material.reflectivity  * reflectColor ) + ( ( 1 - hit.object->material.reflectivity ) * origColor );
+			color = ( hit.Mtl().reflectivity  * reflectColor ) + ( ( 1 - hit.Mtl().reflectivity ) * origColor );
 		}
 	}
 	else return origColor;

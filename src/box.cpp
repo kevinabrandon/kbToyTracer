@@ -129,6 +129,7 @@ bool Box::Intersect( const Ray &ray, HitInfo &hitinfo ) const
     hitinfo.normal   = N;
     hitinfo.ray      = ray;
     hitinfo.object   = this;
+    hitinfo.material = &material;
 
     // (KB: planar uv for 2D textures -- the hit point's world coordinates in
     // the plane of the face, so a texture's frequency is in world units and

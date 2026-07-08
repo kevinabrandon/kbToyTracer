@@ -45,31 +45,37 @@ begin List
 	diffuse		[0.54, 0.53, 0.87]
 	specular		[1, 1, 1]
 	reflectivity	0
+	Phong_exp	0
 
 	box			(-4, -6, -2) (4, 6, -1)
 	diffuse		[0.84, 0.87, 0.63]
 	specular		[1, 1, 1]
 	reflectivity	0
+	Phong_exp	0
 
 	quad			(-4, 6, -1) (-4, 6, 4) (-4, -6, 4) (-4, -6, -1)
 	diffuse		[1, 0, 0]
 	specular		[1, 1, 1]
 	reflectivity	0
+	Phong_exp	0
 
 	quad			(4, 6, -1) (4, 6, 4) (-4, 6, 4) (-4, 6, -1)
 	diffuse		[0, 1, 0]
 	specular		[1, 1, 1]
 	reflectivity	0
+	Phong_exp	0
 
 	quad			(-4, -6, -1) (-4, -6, 4) (4, -6, 4) (4, -6, -1)
 	diffuse		[0, 1, 1]
 	specular		[1, 1, 1]
 	reflectivity	0
+	Phong_exp	0
 
 	quad			(4, -6, -1) (4, -6, 1) (4, 6, 1) (4, 6, -1)
 	diffuse		[1, 1, 0]
 	specular		[1, 1, 1]
 	reflectivity	0
+	Phong_exp	0
 
 end
 
