@@ -10,6 +10,8 @@
 *   10/22/2004  Kevin Brandon - moved declarations to kbBox.h and          *
 *               merged in Arvo's handout intersector, so all code          *
 *               in this file is James Arvo's.                              *
+*   07/07/2026  Kevin Brandon - planar face uv coords (marked below), so   *
+*               2D textures can be applied to boxes.                       *
 *                                                                          *
 ***************************************************************************/
 
@@ -128,6 +130,13 @@ bool Box::Intersect( const Ray &ray, HitInfo &hitinfo ) const
     hitinfo.ray      = ray;
     hitinfo.object   = this;
     hitinfo.material = &material;
+
+    // (KB: planar uv for 2D textures -- the hit point's world coordinates in
+    // the plane of the face, so a texture's frequency is in world units and
+    // the pattern is continuous across coplanar faces of adjacent boxes.)
+    if( N.x != 0 )      hitinfo.uv = Vec2( hitinfo.point.y, hitinfo.point.z );
+    else if( N.y != 0 ) hitinfo.uv = Vec2( hitinfo.point.x, hitinfo.point.z );
+    else                hitinfo.uv = Vec2( hitinfo.point.x, hitinfo.point.y );
     return true;
     }
 int Box::GetSamples( const Vec3 &P, const Vec3 &N, Sample *samples, int n ) const

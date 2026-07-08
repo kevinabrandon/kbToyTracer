@@ -1,0 +1,77 @@
+# The class scene, stage 8: the point light is replaced by a spherical
+# area light (same direction from the scene, but brought closer so its
+# angular size -- and therefore the penumbra -- is clearly visible).
+# Everything else is identical to scene2-matrix.sdf.
+
+eye          (5.0,-2.0, 2.8)
+lookat       (0.0, 1.1, 0.25)
+up           (0.0, 0.0, 1.0)
+vpdist       2.75
+
+amblight     [0.2, 0.2, 0.2]
+bgcolor      [0.15, 0.25, 0.35]
+
+
+begin BVH
+
+    ## Spherical light source (soft shadows when shadow_samples > 0).
+
+    sphere       (-1.5, -2.0, 6.0) 1.0
+    diffuse      [1, 1, 1]
+    emission     [3, 3, 3]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+    ## The colored room (from the 2004/5 lens scenes): red wall in back,
+    ## green to the right, cyan to the left (out of direct view), and a
+    ## half-height yellow wall behind the camera, which looks over it.
+
+    quad         (-4, 6, -1) (-4, 6, 4) (-4, -6, 4) (-4, -6, -1)
+    diffuse      [1, 0, 0]
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    0
+
+    quad         (4, 6, -1) (4, 6, 4) (-4, 6, 4) (-4, 6, -1)
+    diffuse      [0, 1, 0]
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    0
+
+    quad         (-4, -6, -1) (-4, -6, 4) (4, -6, 4) (4, -6, -1)
+    diffuse      [0, 1, 1]
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    0
+
+    quad         (4, -6, -1) (4, -6, 1) (4, 6, 1) (4, 6, -1)
+    diffuse      [1, 1, 0]
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    0
+
+    sphere       (0, 0, 0) 1
+    matrix       ( 0.5, 0, 0, 0; 0, 1, 0, 0; 0, 0, 1.5, 0.5 )
+    diffuse      [0.96, 0.65, 0.58]
+    specular     [1.00, 0.85, 0.75]
+    reflectivity 0.40
+    Phong_exp    15
+
+    box          (-1, 1.2, -1) (1, 2, 2)
+    diffuse      [0.54, 0.53, 0.87]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+    box          (-4, -6, -2) (4, 6, -1)
+    diffuse      [0.84, 0.87, 0.63]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+end

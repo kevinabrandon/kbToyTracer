@@ -78,6 +78,10 @@ CASES = [
     ("textures",               "tests/textures.sdf",           {},
      "Procedural textures on spheres (uv + solid noise): checkerboard, stripes, "
      "and Perlin-noise marble, plus specular over a textured surface."),
+    ("textures-on-boxes",      "scene5-checker-floor.sdf",     {},
+     "Textures on boxes: a checkered blue box and a 40%-reflective checkered "
+     "floor (both planar face uv coords), around a 70% glass ellipsoid in the "
+     "colored room under an area light (the extended class scene)."),
     ("aggregate-list",         "@scene1-list",                 {},
      "scene1 rewritten to use the brute-force List aggregate: every ray tests "
      "every object. Must render identically to the BVH version."),

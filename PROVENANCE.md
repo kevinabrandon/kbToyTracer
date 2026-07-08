@@ -21,7 +21,7 @@ Byte-faithful to the archive except for C++17 portability fixes
 | `triangle.cpp` | marked changes: normal flipped to match kbToyTracer's winding convention; `HitInfo.material` stamp (instancing, 2026) |
 | `quad.cpp` | marked changes: normal flipped, `uv` defaulted, `HitInfo.material` stamp (2026) |
 | `util.cpp` | marked change: `rand()` rewritten thread-local so OpenMP rendering is race-free (2026) |
-| `box.cpp` | all Arvo code; KB restructuring only (declarations moved to `kbBox.h`, Arvo's handout ray-box intersector merged in), plus the `HitInfo.material` stamp (2026) |
+| `box.cpp` | KB restructuring (declarations moved to `kbBox.h`, Arvo's handout ray-box intersector merged in); marked changes: planar face `uv` coords for texturing, `HitInfo.material` stamp (2026) |
 
 ## Mixed files (Arvo skeleton, KB extensions — see each header's `Provenance:` note)
 
