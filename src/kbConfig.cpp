@@ -32,13 +32,14 @@ bool kbConfig::Load( const char *path )
         INT_OPT(width) INT_OPT(height)
         INT_OPT(numSampsLarge) INT_OPT(numSampsSmall)
         INT_OPT(lensSamps) INT_OPT(numBounces) INT_OPT(dlSamp)
-        BOOL_OPT(enable_supersample) BOOL_OPT(enable_sochastic_super)
+        BOOL_OPT(enable_supersample) BOOL_OPT(enable_stochastic_super)
         BOOL_OPT(enable_adaptive_super) BOOL_OPT(enable_camera_lens)
         BOOL_OPT(enable_shading) BOOL_OPT(enable_specular) BOOL_OPT(enable_shadows)
         BOOL_OPT(enable_transparent_shadows)
         BOOL_OPT(enable_reflection) BOOL_OPT(enable_refraction)
         BOOL_OPT(enable_indirect_light) BOOL_OPT(enable_stratify_light)
         BOOL_OPT(enable_area_light) BOOL_OPT(bg_escaped_rays)
+        BOOL_OPT(display_messages)
         else fprintf( stderr, "kbConfig: unknown setting '%s'\n", key );
         #undef INT_OPT
         #undef BOOL_OPT

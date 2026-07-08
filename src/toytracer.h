@@ -14,8 +14,12 @@
 * 2) Some method of anti-aliasing; that is, a method for removing the      *
 *    jagged edges, probably by casting multiple rays per pixel.            *
 *                                                                          *
+* Provenance:                                                              *
+* Original: James Arvo (EECS 204, UC Irvine).  Extended by Kevin           *
+* Brandon: Lens (depth of field), Material texture/refractivity,           *
+* HitInfo uv coords, inside_ray type, kb texture hook.                     *
+*                                                                          *
 * History:                                                                 *
-*	10/22/2004	Kevin Brandon											   *
 *   10/10/2004  Added Aggregate sub-class & REGISTER_OBJECT macro.         *
 *   10/06/2004  Added type to ray & ray to HitInfo.  Removed HitGeom.      *
 *   09/29/2004  Updated for Fall 2004 class.                               *
@@ -56,13 +60,6 @@ struct Ray {            // A ray in R3.
     };
 
 struct Material {       // Surface material for shading.
-	//~Material( ) 
-	//{ 
-	//	if( texture != NULL ) 
-	//	{
-	//		delete texture; 
-	//	}
-	//}
     Color diffuse;      // Diffuse color.
     Color specular;     // Color of highlights.
     Color emission;     // Emitted light.
@@ -130,14 +127,7 @@ struct Sample {         // A point and weight returned from a sampling algorithm
 
 struct Object {         // The base class for all objects that can be ray traced.
     Object() {}
-	virtual ~Object() 
-	{ 
-		parent = 0; 
-		//if( material.texture != NULL ) 
-		//{
-		//	delete material.texture; 
-		//}
-	}
+    virtual ~Object() { parent = 0; }
     virtual bool Intersect( const Ray &ray, HitInfo & ) const = 0;
     virtual Box3 GetBounds() const = 0;
     virtual int GetSamples( const Vec3 &P, const Vec3 &N, Sample *samples, int n ) const { return 0; }
@@ -152,7 +142,6 @@ struct Object {         // The base class for all objects that can be ray traced
     };
 
 struct Scene {
-//	~Scene( ) { if( object != NULL ) delete object; }
     Color ambient;              // Ambient light (from all directions).
     Color bgcolor;              // Background color, if the ray does not hit anything. 
     Object *object;             // Either a single primitve or an aggregate object.
@@ -210,7 +199,7 @@ extern bool MakeImage(
     );
 
 
-extern Color AdaptaveSuper(int i, int j, Vec3 dU, Vec3 dR, Vec3 O, Ray ray, const Scene &scene, double thr,  bool first);
+extern Color AdaptiveSuper(int i, int j, Vec3 dU, Vec3 dR, Vec3 O, Ray ray, const Scene &scene, double thr,  bool first);
 
 bool CompareColor( const Color &A, const Color &B, const double thr );
 

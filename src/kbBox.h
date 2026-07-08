@@ -1,12 +1,12 @@
 //
-//	Box.h
+//	kbBox.h
 //
 //	10/22/2004	Kevin Brandon	-	Broken out of box.cpp
 //
 //
-#ifndef _BOX_H_
+#ifndef KB_BOX_H
 
-#define _BOX_H_
+#define KB_BOX_H
 
 #include "toytracer.h"
 #include <stdio.h>

@@ -1,4 +1,7 @@
-#include "SolidNoise.h"
+//
+//	kbSolidNoise.cpp
+//
+#include "kbSolidNoise.h"
 #include <stdlib.h>
 #include <stdio.h>
 

@@ -89,4 +89,6 @@ Two things worth understanding:
 The original toytracer kernel is **James Arvo's**, from EECS 204 (UC Irvine, Fall 2004). A
 faithful archive of that original teaching code is preserved separately at
 **github.com/kevinabrandon/arvo-toytracer-archive**. Everything layered on top of that kernel
-in this repository is my own coursework and later hobby work.
+in this repository is my own coursework and later hobby work. The convention in `src/`:
+files prefixed **`kb`** are mine, unprefixed files are Arvo's — see
+[PROVENANCE.md](PROVENANCE.md) for the file-by-file breakdown.

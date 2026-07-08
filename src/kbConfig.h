@@ -3,11 +3,11 @@
 *                                                                          *
 * Runtime render settings, loaded from a simple key/value config file.     *
 * Historically these were compile-time constants scattered through         *
-* toytracer1.cpp and shade1.cpp; they are now gathered here so a render     *
+* kbTrace.cpp and kbShade.cpp; they are now gathered here so a render      *
 * can be tuned without recompiling.                                        *
 *                                                                          *
-* (The direct/indirect light sample counts N_DL_SAMP / N_IDL_SAMP remain    *
-*  compile-time in shade1.cpp because they size fixed arrays.)             *
+* (The direct/indirect light sample counts MAX_DL_SAMP / N_IDL_SAMP remain *
+*  compile-time in kbShade.cpp because they size fixed arrays.)            *
 ***************************************************************************/
 #ifndef KB_CONFIG_H
 #define KB_CONFIG_H
@@ -18,12 +18,12 @@ struct kbConfig
     int  width  = 320;
     int  height = 240;
 
-    // Anti-aliasing (toytracer1.cpp).
-    bool enable_supersample     = true;
-    bool enable_sochastic_super = false;   // jittered supersampling
-    bool enable_adaptive_super  = false;
-    int  numSampsLarge          = 2;       // NxN samples per pixel
-    int  numSampsSmall          = 2;
+    // Anti-aliasing (kbTrace.cpp).
+    bool enable_supersample      = true;
+    bool enable_stochastic_super = false;   // jittered supersampling
+    bool enable_adaptive_super   = false;
+    int  numSampsLarge           = 2;       // NxN samples per pixel
+    int  numSampsSmall           = 2;
 
     // Depth of field (thin lens); aperture/focus come from the scene file.
     bool enable_camera_lens     = false;
@@ -41,7 +41,7 @@ struct kbConfig
     // (1,4,9,16,... total). Only used when enable_area_light is on. Max 8 (see MAX_DL_SAMP).
     int  dlSamp                 = 3;
 
-    // Shading toggles (shade1.cpp).
+    // Shading toggles (kbShade.cpp).
     bool enable_shading         = true;
     bool enable_specular        = true;
     bool enable_shadows         = true;
@@ -53,6 +53,9 @@ struct kbConfig
     bool enable_indirect_light  = false;
     bool enable_stratify_light  = false;
     bool enable_area_light      = false;
+
+    // Console output (render progress etc.).
+    bool display_messages       = true;
 
     // Load overrides from a config file. Returns false if it can't be opened
     // (in which case the defaults above are used).

@@ -1,5 +1,11 @@
-#ifndef SOLID_NOISE_H
-#define SOLID_NOISE_H
+//
+//	kbSolidNoise.h
+//
+//	Perlin-style solid noise (after Shirley & Morley, "Realistic Ray
+//	Tracing").  Drives the procedural marble texture (kbMarbleTex).
+//
+#ifndef KB_SOLIDNOISE_H
+#define KB_SOLIDNOISE_H
 
 #include <stdlib.h>
 #include <math.h>

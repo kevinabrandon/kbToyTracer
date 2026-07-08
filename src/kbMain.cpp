@@ -1,5 +1,5 @@
 /***************************************************************************
-* main.cpp                                                                 *
+* kbMain.cpp                                                               *
 *                                                                          *
 * Standalone command-line entry point for kbToyTracer. Renders a single    *
 * scene description (.sdf) to a PPM image.                                  *
@@ -21,7 +21,6 @@
 #include "toytracer.h"
 #include "kbConfig.h"
 
-bool bDisplayMessages = true;   // referenced by toytracer1.cpp / reader1.cpp
 
 static std::string deriveOutput( const char *scene )
 {

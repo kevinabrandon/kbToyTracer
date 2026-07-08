@@ -1,14 +1,14 @@
 /***************************************************************************
-* list.h   (aggregate object)                                              *
+* kbList.h (aggregate object)                                              *
 *																		   *   
-*		Header file for list.c											   *
+*		Header file for list.cpp										   *
 *                                                                          *
 * History:                                                                 *
 *	10/20/2004	Broken out of list.c	                                   *
 *                                                                          *
 ***************************************************************************/
-#ifndef _LIST_H_
-#define _LIST_H_
+#ifndef KB_LIST_H
+#define KB_LIST_H
 
 #include "toytracer.h"
 

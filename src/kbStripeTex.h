@@ -2,8 +2,8 @@
 //	kbStripeTex.h
 //
 
-#ifndef _KBSTRIPETEX_H_
-#define _KBSTRIPETEX_H_
+#ifndef KB_STRIPETEX_H
+#define KB_STRIPETEX_H
 
 #include "kbTexture.h"
 

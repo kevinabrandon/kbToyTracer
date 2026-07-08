@@ -2,8 +2,8 @@
 //	kbImageTex.h
 //
 
-#ifndef _KBIMAGETEX_H_
-#define _KBIMAGETEX_H_
+#ifndef KB_IMAGETEX_H
+#define KB_IMAGETEX_H
 
 #include "kbTexture.h"
 #include "Image.h"

@@ -1,5 +1,5 @@
 /***************************************************************************
-* reader.cpp                                                               *
+* kbReader.cpp                                                             *
 *                                                                          *
 * This file defines the ReadSceneDescription function, which reads a       *
 * simple text description of a scene and the camera.                       *

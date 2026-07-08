@@ -1,5 +1,5 @@
 /***************************************************************************
-* shade.C                                                                  *
+* kbShade.cpp                                                              *
 *                                                                          *
 * This file defines the shader for the toy tracer.  The job of the shader  *
 * is to determine the color of the surface, viewed from the origin of      *

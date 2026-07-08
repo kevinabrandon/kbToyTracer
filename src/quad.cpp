@@ -61,7 +61,7 @@ Quad::Quad( const Vec3 &A_, const Vec3 &B_, const Vec3 &C_, const Vec3 &D_ )
     box.X = Interval( min( min( A.x, B.x ), min( C.x, D.x ) ), max( max( A.x, B.x ), max( C.x, D.x ) ) ); 
     box.Y = Interval( min( min( A.y, B.y ), min( C.y, D.y ) ), max( max( A.y, B.y ), max( C.y, D.y ) ) ); 
     box.Z = Interval( min( min( A.z, B.z ), min( C.z, D.z ) ), max( max( A.z, B.z ), max( C.z, D.z ) ) ); 
-	    }
+    }
 
 Object *Quad::ReadString( const char *params ) // Read params from string.
     {
@@ -73,9 +73,9 @@ Object *Quad::ReadString( const char *params ) // Read params from string.
     }
 
 Box3 Quad::GetBounds() const // Return pre-computed box.
-{
+    {
     return box;
-}
+    }
 
 bool Quad::Intersect( const Ray &ray, HitInfo &hitinfo ) const
     {
@@ -99,14 +99,12 @@ bool Quad::Intersect( const Ray &ray, HitInfo &hitinfo ) const
     // We have an actual hit.  Fill in all the geometric information so
     // that the shader can shade this point.
 
-	Vec2 uv;
-
     hitinfo.distance = s;
-    hitinfo.point    = P; 
-    hitinfo.normal   = -N;
+    hitinfo.point    = P;
+    hitinfo.normal   = -N;  // (KB: flipped to match kbToyTracer's winding convention.)
     hitinfo.ray      = ray;
-	hitinfo.uv       = uv;
     hitinfo.object   = this;
+    hitinfo.uv       = Vec2();  // (KB: quads carry no texture parameterization yet.)
     return true;
     }
 
@@ -128,18 +126,17 @@ int Quad::GetSamples( const Vec3 &O, const Vec3 &N1, Sample *samples, int n ) co
     // samples as we loop over them, weighting each sample by the correct conversion factor.
 
     for( int i = 0; i < n; i++ )
-	{
-		for( int j = 0; j < n; j++ )
+    for( int j = 0; j < n; j++ )
         {
-			double s = ( i + rand( 0.0, 0.999 ) ) * delta;
-			double t = ( j + rand( 0.0, 0.999 ) ) * delta;
-			Vec3 P = (1.0 - s) * ( (1.0 - t) * A + t * B ) + s * ( (1.0 - t) * D + t * C );
-			Vec3 U = Unit( P - O );
-			samples[k].P = P;
-			samples[k].w = darea * fabs( N * U ) / LengthSquared( P - O );
-			k++;
+        double s = ( i + rand( 0.0, 0.999 ) ) * delta;
+        double t = ( j + rand( 0.0, 0.999 ) ) * delta;
+        Vec3 P = (1.0 - s) * ( (1.0 - t) * A + t * B ) + s * ( (1.0 - t) * D + t * C );
+        Vec3 U = Unit( P - O );
+        samples[k].P = P;
+        samples[k].w = darea * fabs( N * U ) / LengthSquared( P - O );
+        k++;
         }
-	}
+
     // Return the number of samples generated.  For quads, this will always be the
     // square of the number requested.
 

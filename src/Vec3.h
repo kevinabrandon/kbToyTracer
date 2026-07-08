@@ -5,7 +5,6 @@
 * It has all of the obvious operators defined as inline functions.         *
 *                                                                          *
 * History:                                                                 *
-*	10/22/2004	Kevin Brandon											   *
 *   04/01/2003  Initial coding.                                            *
 *                                                                          *
 ***************************************************************************/
@@ -17,7 +16,6 @@
 
 struct Vec3 {
     inline Vec3()                               { x = 0; y = 0; z = 0; }
-//	inline Vec3( Vec3 &A )	{ x = A.x; y = A.y; z = A.z; }
     inline Vec3( double a, double b, double c ) { x = a; y = b; z = c; }
     double x;
     double y;
@@ -116,16 +114,6 @@ inline Vec3 operator/( const Vec3 &A, const Vec3 &B )  // Remove component paral
     if( x > 0.0 ) return A - (( A * B ) / x) * B;
 	return A;
     }
-	/*
-inline bool operator< ( const Vec3 &A, const Vec3 &B)
-{
-	return (A.x < B.x) && (A.y < B.y) && (A.z < B.z);
-}
-
-inline bool operator>( const Vec3 &A, const Vec3 &B )
-{
-	return (A.x > B.x) && (A.y > B.y) && (A.z > B.z);
-}*/
 
 inline Vec3 Unit( const Vec3 &A )
     {
@@ -144,7 +132,7 @@ inline double dist( const Vec3 &A, const Vec3 &B ) // Euclidean distance from A 
     return Length( A - B ); 
     }
 
-	inline std::ostream &operator<<( std::ostream &out, const Vec3 &A )
+inline std::ostream &operator<<( std::ostream &out, const Vec3 &A )
     {
     out << "( " << A.x << ", " << A.y << ", " << A.z << " ) ";
     return out;

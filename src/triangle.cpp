@@ -43,7 +43,7 @@ Triangle::Triangle( const Vec3 &A_, const Vec3 &B_, const Vec3 &C_ )
     B = B_;
     C = C_;
 
-    N = -Unit( (A - B) ^ (C - B) ); // Compute the normal vector.
+    N = -Unit( (A - B) ^ (C - B) ); // Compute the normal vector.  (KB: flipped to match kbToyTracer's winding convention.)
     d = A * N;
 
     // Determine which axis is the "dominant" axis of the triangle.  That is, which

@@ -1,10 +1,10 @@
-#ifndef MARBLE_TEXTURE_H
-#define MARBLE_TEXTURE_H
+#ifndef KB_MARBLETEX_H
+#define KB_MARBLETEX_H
 
 
 #include "kbTexture.h"
 #include "toytracer.h"
-#include "SolidNoise.h"
+#include "kbSolidNoise.h"
 
 
 class kbMarbleTexture : public kbTexture 

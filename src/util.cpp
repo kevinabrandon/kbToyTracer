@@ -4,7 +4,6 @@
 * Trivial utilities.                                                       *
 *                                                                          *
 * History:                                                                 *
-*	10/22/2004	Kevin Brandon											   *
 *   10/16/2004  Fixed bug in Mat3x3 * Box3 operator.                       *
 *   10/10/2004  Broken out from torytracer.C.                              *
 *                                                                          *
@@ -12,14 +11,14 @@
 #include "toytracer.h"
 #include <random>
 
-// Return a random number in [a,b].  Uses a per-thread generator so that
-// parallel (OpenMP) rendering is race-free and each thread is decorrelated.
+// (KB: rewritten with a per-thread generator so parallel OpenMP rendering
+//  is race-free and each thread is decorrelated.)
 double rand( double a, double b )
-{
+    {
     static thread_local std::mt19937 gen( std::random_device{}() );
     std::uniform_real_distribution<double> dist( a, b );
     return dist( gen );
-}
+    }
 
 Interval &Interval::operator+=( const Interval &A )
     {

@@ -2,8 +2,8 @@
 //	kbCheckerTex.h
 //
 
-#ifndef _KBCHECKERTEX_H_
-#define _KBCHECKERTEX_H_
+#ifndef KB_CHECKERTEX_H
+#define KB_CHECKERTEX_H
 
 #include <math.h>
 #include "toytracer.h"

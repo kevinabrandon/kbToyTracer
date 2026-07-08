@@ -7,7 +7,6 @@
 * each vector it is multiplied with.                                       *
 *                                                                          *
 * History:                                                                 *
-*	10/22/2004	Kevin Brandon											   *
 *   10/10/2004  Added Inverse function.                                    *
 *   10/06/2004  Initial coding.                                            *
 *                                                                          *
@@ -96,14 +95,14 @@ inline Mat3x4 Translate( double x, double y, double z )
     return Mat3x4( Mat3x3::Identity(), Vec3( x, y, z ) );
     }
 
-	inline std::ostream &operator<<( std::ostream &out, const Mat3x4 &M )
+inline std::ostream &operator<<( std::ostream &out, const Mat3x4 &M )
     {
     // Write out a 3x4 matrix in the same format that the toytracer parser can read.
     out << "\n( "; 
     out << M.mat(0,0) << ", " << M.mat(0,1) << ", " << M.mat(0,2) << ", " << M.vec.x << "; ";
     out << M.mat(1,0) << ", " << M.mat(1,1) << ", " << M.mat(1,2) << ", " << M.vec.y << "; ";
     out << M.mat(2,0) << ", " << M.mat(2,1) << ", " << M.mat(2,2) << ", " << M.vec.z;
-	out << " )" << std::endl;
+    out << " )" << std::endl;
     return out;
     }
 

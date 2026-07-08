@@ -1,16 +1,16 @@
 //
-//	SpacialSub.h
+//	kbSpatialSub.h
 //
 //	Aggregate Class
 //
 //	Kevin Brandon
 //
-#ifndef _SPACIALSUB_H_
-#define _SPACIALSUB_H_
+#ifndef KB_SPATIALSUB_H
+#define KB_SPATIALSUB_H
 
 #include "toytracer.h"
-#include "List.h"
-#include "Box.h"
+#include "kbList.h"
+#include "kbBox.h"
 #include <mutex>
 
 #define N 12	//	N^3 is the number of voxels in the scene
@@ -29,14 +29,14 @@ struct Voxel : public Box
 
 };
 
-struct SpacialSub : public Aggregate 
+struct SpatialSub : public Aggregate 
 { 
-    SpacialSub();
-   ~SpacialSub();
+    SpatialSub();
+   ~SpatialSub();
     virtual bool Intersect( const Ray &ray, HitInfo & ) const;
     virtual Box3 GetBounds() const;
     virtual Object *ReadString( const char *params );
-    virtual const char *MyNameIs() const { return "Spacial Subdivision"; }
+    virtual const char *MyNameIs() const { return "Spatial Subdivision"; }
     virtual void AddChild( Object * );
     virtual void Transform( const Mat3x4 & );
 	
@@ -81,6 +81,6 @@ static bool BoxIntersect(Vec3 firstMin, Vec3 firstMax, Vec3 secondMin, Vec3 seco
 // When this module is linked in, the toytracer 
 // will automatically recognize the new objects 
 // and read them from sdf files.
-REGISTER_OBJECT( SpacialSub );
+REGISTER_OBJECT( SpatialSub );
 
 #endif

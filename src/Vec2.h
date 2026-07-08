@@ -5,7 +5,6 @@
 * It has all of the obvious operators defined as inline functions.         *
 *                                                                          *
 * History:                                                                 *
-*	10/22/2004	Kevin Brandon											   *
 *   04/01/2003  Initial coding.                                            *
 *                                                                          *
 ***************************************************************************/
@@ -118,7 +117,7 @@ inline double dist( const Vec2 &A, const Vec2 &B ) // Euclidean distance from A 
     return Length( A - B ); 
     }
 
-	inline std::ostream &operator<<( std::ostream &out, const Vec2 &A )
+inline std::ostream &operator<<( std::ostream &out, const Vec2 &A )
     {
     out << "( " << A.x << ", " << A.y << " ) ";
     return out;

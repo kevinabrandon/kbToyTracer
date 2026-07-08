@@ -17,7 +17,10 @@
 * falls on the positive part of the ray, and if so, which is closer.       *
 *                                                                          *
 * History:                                                                 *
-*	10/22/2004	Kevin Brandon											   *
+* Provenance:                                                              *
+* Original: James Arvo (EECS 204, UC Irvine).  Extended by Kevin           *
+* Brandon: spherical uv coords for texturing, and GetSamples               *
+* (solid-angle sampling of spherical area lights for soft shadows).        *
 *   10/10/2004  Broken out of objects.C file.                              *
 *                                                                          *
 ***************************************************************************/

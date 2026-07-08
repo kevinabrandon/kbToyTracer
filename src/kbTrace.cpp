@@ -1,5 +1,5 @@
 /***************************************************************************
-* toytracer.C                                                              *
+* kbTrace.cpp                                                              *
 *                                                                          *
 * This is the source file for a "Toy" ray tracer.  It defines most of the  *
 * fundamental functions using in ray tracing; in particular, "Trace" and   *
@@ -19,7 +19,6 @@
 #include "kbConfig.h"
 #include <chrono>
 
-extern bool bDisplayMessages;
 
 static unsigned long
 			NumberOfRays = 0;
@@ -132,7 +131,7 @@ bool MakeImage( const Camera &cam, const Lens &lens, const Scene &scene, int xre
 		{
 			if ( Config.enable_adaptive_super )
 			{
-				I(i,j) = ToneMap ( AdaptaveSuper( i, j, dU, dR, O, ray, scene, 0.01, true ) );
+				I(i,j) = ToneMap ( AdaptiveSuper( i, j, dU, dR, O, ray, scene, 0.01, true ) );
 			}
 			else if( Config.enable_supersample )
 			{
@@ -141,7 +140,7 @@ bool MakeImage( const Camera &cam, const Lens &lens, const Scene &scene, int xre
 				{
 					for(int l = 0; l < Config.numSampsLarge; l++)
 					{
-						if ( Config.enable_sochastic_super )
+						if ( Config.enable_stochastic_super )
 						{
 							double x = rand( 0, 1 );
 							double y = rand( 0, 1 );
@@ -184,10 +183,10 @@ bool MakeImage( const Camera &cam, const Lens &lens, const Scene &scene, int xre
 				I(i,j) = ToneMap( Trace( ray, scene, Config.numBounces ) );
 			}
 		}
-		if( bDisplayMessages && i % 10 == 0 ) { printf( "\r\t%6.2f%c Complete", ( ( i / ( double ) smallRes ) * 100.0 ), '%' ); fflush( stdout ); }
+		if( Config.display_messages && i % 10 == 0 ) { printf( "\r\t%6.2f%c Complete", ( ( i / ( double ) smallRes ) * 100.0 ), '%' ); fflush( stdout ); }
 	}
 
-	if( bDisplayMessages )	
+	if( Config.display_messages )	
 	{
 		std::cout << "\r\t100.00% Complete" << std::endl << std::endl;
 	
@@ -212,12 +211,12 @@ bool MakeImage( const Camera &cam, const Lens &lens, const Scene &scene, int xre
 	return true;
     }
 
-Color AdaptaveSuper(int i, int j, Vec3 dU, Vec3 dR, Vec3 O, Ray ray, const Scene &scene, double thr, bool first)
+Color AdaptiveSuper(int i, int j, Vec3 dU, Vec3 dR, Vec3 O, Ray ray, const Scene &scene, double thr, bool first)
 {
 	Color average;
 	if ( first )
 	{
-		// this is the first call to AdaptaveSuper()
+		// this is the first call to AdaptiveSuper()
 		// send four rays through corners of pixel
 	
 		/*
@@ -263,8 +262,8 @@ Color AdaptaveSuper(int i, int j, Vec3 dU, Vec3 dR, Vec3 O, Ray ray, const Scene
 			if ( !CompareColor( color[ n ], average, thr ) )
 			{
 				// the four samples are not close enough... we need to get more
-				// recursivly call AdaptaveSamp
-				return AdaptaveSuper( i, j, dU, dR, O, ray, scene, thr, false );
+				// recursively call AdaptiveSuper
+				return AdaptiveSuper( i, j, dU, dR, O, ray, scene, thr, false );
 
 			}
 			else

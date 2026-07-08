@@ -1,18 +1,18 @@
 /***************************************************************************
-* list.C   (aggregate object)                                              *
+* list.C   (aggregate object)                                            *
 *                                                                          * 
-*                                                                          *
-* History:                                                                 *
-*	10/22/2004	Kevin Brandon - Removed declerations and put			   *
-*				them in list.h											   *
-*	10/20/2004	Kevin Brandon - Allowed affine transformations			   *
-*   10/16/2004  Changed the way the bounding box is computed.              *
-*   10/16/2004  Added more documentation, and call to "Inverse" function.  *
-*   10/06/2004  Initial coding.                                            *
-*                                                                          *
+*                                                                        *
+* History:                                                               *
+*   10/22/2004  Kevin Brandon - moved declarations to kbList.h.           *
+*   10/20/2004  Kevin Brandon - per-child affine transforms (rays         *
+*               are mapped through each node's inverse matrix).           *
+*   10/16/2004  Changed the way the bounding box is computed.            *
+*   10/16/2004  Added more documentation, and call to "Inverse" function.*
+*   10/06/2004  Initial coding.                                          *
+*                                                                        *
 ***************************************************************************/
 
-#include "List.h"
+#include "kbList.h"
 
 
 // Provide the constructor and destructor for the List object.   

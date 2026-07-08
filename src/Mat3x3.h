@@ -4,7 +4,6 @@
 * Mat3x3 is a 3x3 matrix class, with associated operators.                 *
 *                                                                          *
 * History:                                                                 *
-*	10/22/2004	Kevin Brandon											   *
 *   10/16/2004  Added ^ operator for multiplying by the transpose.         *
 *   10/10/2004  Added Inverse function.                                    *
 *   04/07/2003  Initial coding.                                            *
@@ -182,13 +181,13 @@ inline Mat3x3 Scale( double x, double y, double z )
     return M;
     }
 
-	inline std::ostream &operator<<( std::ostream &out, const Mat3x3 &M )
+inline std::ostream &operator<<( std::ostream &out, const Mat3x3 &M )
     {
     out << "\n";
     out << "| " << M(0,0) << " " << M(0,1) << " " << M(0,2) << " |\n";
     out << "| " << M(1,0) << " " << M(1,1) << " " << M(1,2) << " |\n";
     out << "| " << M(2,0) << " " << M(2,1) << " " << M(2,2) << " |\n";
-	out << std::endl;
+    out << std::endl;
     return out;
     }
 

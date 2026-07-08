@@ -2,8 +2,8 @@
 //	kbDefaultTex.h
 //	
 
-#ifndef _KBDEFAULTTEX_H_
-#define _KBDEFAULTTEX_H_
+#ifndef KB_DEFAULTTEX_H
+#define KB_DEFAULTTEX_H
 
 #include "kbTexture.h"
 

@@ -1,12 +1,12 @@
 //
-//	SpacialSub.cpp
+//	kbSpatialSub.cpp
 //
-//	Aggregate Class - Implements a spacial subdivision acceleration method
+//	Aggregate Class - Implements a spatial subdivision acceleration method
 //
 //	Kevin Brandon
 //
 
-#include "SpacialSub.h"
+#include "kbSpatialSub.h"
 #include <chrono>
 
 Voxel::Voxel()
@@ -21,13 +21,13 @@ Voxel::Voxel()
 	list = NULL;
 }
 
-SpacialSub::SpacialSub()
+SpatialSub::SpatialSub()
 {
 	listOfObjects = new List();
 	builtLattice = false;
 }
 
-SpacialSub::~SpacialSub()
+SpatialSub::~SpatialSub()
 {
 	// delete all lists that were 'newed'
 
@@ -41,14 +41,14 @@ SpacialSub::~SpacialSub()
 	}
 }
 
-void SpacialSub::AddChild( Object * obj )
+void SpatialSub::AddChild( Object * obj )
 {
 	// simply add the object to the list... 
 	// we will add it to the voxels later
 	listOfObjects->AddChild( obj );
 }
 
-bool SpacialSub::Intersect(const Ray &ray, HitInfo &hitinfo) const
+bool SpatialSub::Intersect(const Ray &ray, HitInfo &hitinfo) const
 {
 	// If this is the first time Intersect is called
 	// then the lattic has not been built.  Here we
@@ -79,12 +79,12 @@ bool SpacialSub::Intersect(const Ray &ray, HitInfo &hitinfo) const
 	return intersect; 
 }
 
-void SpacialSub::BuildLattice() const
+void SpatialSub::BuildLattice() const
 {
 	// used for timing how long it takes to build the lattice
 	auto liStart = std::chrono::high_resolution_clock::now();
 	
-	std::cout << "building lattice for the spacial subdivision!" << std::endl;
+	std::cout << "building lattice for the spatial subdivision!" << std::endl;
 
 	// bounding box of the entire scene
 	Box3 sceneBBox = listOfObjects->GetBounds();
@@ -180,7 +180,7 @@ void SpacialSub::BuildLattice() const
 	builtLattice = true;	
 }
 
-void SpacialSub::AddObjectsToVoxels( )	const
+void SpatialSub::AddObjectsToVoxels( )	const
 {
 	// Figgure out which voxel each object belongs to.
 	
@@ -230,7 +230,7 @@ void SpacialSub::AddObjectsToVoxels( )	const
 	}
 }
 
-int SpacialSub::ListOfVoxelsOnRay(const Ray &ray, int *list) const
+int SpatialSub::ListOfVoxelsOnRay(const Ray &ray, int *list) const
 {
 	int length = 0;
 	
@@ -264,19 +264,19 @@ int SpacialSub::ListOfVoxelsOnRay(const Ray &ray, int *list) const
 	return length;
 }
 
-void SpacialSub::Transform( const Mat3x4 &mat )
+void SpatialSub::Transform( const Mat3x4 &mat )
 {
 	// no transforming yet...
 }
 
-Object *SpacialSub::ReadString( const char *params )
+Object *SpatialSub::ReadString( const char *params )
 {
 	extern bool Get( const char *line, const char *name, const char *arg);
-	if( Get( params, "begin", "SSub" ) ) return new SpacialSub();
+	if( Get( params, "begin", "SSub" ) ) return new SpatialSub();
 	return NULL;
 }
 
-Box3 SpacialSub::GetBounds() const
+Box3 SpatialSub::GetBounds() const
 {
 	Box3 box;
 	box = listOfObjects->GetBounds();

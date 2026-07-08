@@ -8,7 +8,10 @@
 *                                                                          *
 * History:                                                                 *
 *   04/01/2003  Initial coding.                                            *
-*	10/22/2004	Kevin Brandon											   *
+* Provenance:                                                              *
+* Original: James Arvo (EECS 204, UC Irvine).  Extended by Kevin           *
+* Brandon: PPM-reading constructor and kbGetPixel, used by the             *
+* image-map texture (kbImageTex).                                          *
 *                                                                          *
 ***************************************************************************/
 #ifndef _IMAGE_H_

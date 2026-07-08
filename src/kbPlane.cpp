@@ -1,3 +1,11 @@
+//
+//	kbPlane.cpp    (primitive object)
+//
+//	An infinite plane:  "plane (nx,ny,nz) d"  with unit normal N and
+//	plane equation N*P = d.
+//
+//	Kevin Brandon
+//
 #include <stdio.h>
 #include "toytracer.h"
 

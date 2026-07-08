@@ -2,8 +2,8 @@
 //	kbTexture.h
 //
 
-#ifndef _KBTEXTURE_H_
-#define _KBTEXTURE_H_
+#ifndef KB_TEXTURE_H
+#define KB_TEXTURE_H
 
 #include "Vec2.h"
 #include "Vec3.h"

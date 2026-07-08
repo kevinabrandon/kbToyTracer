@@ -1,5 +1,5 @@
 //
-//	BVH.cpp
+//	kbBVH.cpp
 //
 //	Bounding Volume Hierarchy — after Shirley & Morley, "Realistic Ray Tracing".
 //
@@ -12,7 +12,7 @@
 //	  2026  Implemented the actual hierarchy (K. Brandon), from Shirley's book.
 //
 
-#include "BVH.h"
+#include "kbBVH.h"
 #include <vector>
 #include <algorithm>
 

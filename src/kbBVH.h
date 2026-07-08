@@ -1,5 +1,5 @@
 //
-//	BVH.h
+//	kbBVH.h
 //
 //	Defines a Bounding Volume Hierarchy (Shirley & Morley, "Realistic Ray Tracing").
 //
@@ -12,11 +12,11 @@
 //	they are read from the scene file; the tree is built lazily on the first ray.
 //
 
-#ifndef _BVH_H_
-#define _BVH_H_
+#ifndef KB_BVH_H
+#define KB_BVH_H
 
 #include "toytracer.h"
-#include "List.h"
+#include "kbList.h"
 #include <mutex>
 
 struct BVHNode;   // a node of the BVH tree (defined in BVH.cpp)
@@ -44,4 +44,4 @@ private:
 
 REGISTER_OBJECT( BVH );
 
-#endif // _BVH_H_
+#endif // KB_BVH_H
