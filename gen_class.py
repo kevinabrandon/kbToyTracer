@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
-"""Section 1: the class progression, as one animated WebP. The renderer is built up
-one feature at a time -- exactly the order it was implemented in EECS 204: a flat
-sphere from the given ray tracer, then the box intersector, diffuse shading, shadows,
-specular highlights, reflection, and finally an affine transform.
+"""Section 1: the feature progression, as one animated WebP. The renderer is built up
+one feature at a time. Stages 1-8 are the class work, in exactly the order it was
+implemented in EECS 204: a flat sphere from the given ray tracer, then the box and
+quad intersectors (the blocks and the colored room go up together), diffuse shading,
+shadows, specular highlights, reflection, an affine transform, and a spherical area
+light with soft shadows. Stages 9 on were added later (2026): 70% refractive glass,
+checkerboards on the floor (40% reflective) and the box, and finally everything
+re-ground in marble -- pink ellipsoid, purple box, olive floor (ellipsoid and floor
+at a subtle 5% reflectivity).
+
+(scenes/scene7-dof.sdf adds a thin lens on top of the final stage; it's parked
+outside the progression until the scene has an object near the viewport to sell
+the blur.)
 
 The two "flat" stages have no lighting model, so their ambient is boosted to 1.0 to
 show the raw material color (the scene's real ambient is 0.2, used once shading is on)."""
@@ -20,18 +29,30 @@ except Exception:
 STAGES = [
   ("1 · flat sphere — the given ray tracer", "scene1-sphereonly.sdf",
    dict(enable_shading=0, enable_shadows=0, enable_specular=0, enable_reflection=0), 1.0),
-  ("2 · box intersector added", "scene1-reflection.sdf",
+  ("2 · boxes & quads — the room goes up", "scene1-reflection-room.sdf",
    dict(enable_shading=0, enable_shadows=0, enable_specular=0, enable_reflection=0), 1.0),
-  ("3 · diffuse shading", "scene1-reflection.sdf",
+  ("3 · diffuse shading", "scene1-reflection-room.sdf",
    dict(enable_shading=1, enable_shadows=0, enable_specular=0, enable_reflection=0), None),
-  ("4 · shadows", "scene1-reflection.sdf",
+  ("4 · shadows", "scene1-reflection-room.sdf",
    dict(enable_shading=1, enable_shadows=1, enable_specular=0, enable_reflection=0), None),
-  ("5 · specular highlights", "scene1-reflection.sdf",
+  ("5 · specular highlights", "scene1-reflection-room.sdf",
    dict(enable_shading=1, enable_shadows=1, enable_specular=1, enable_reflection=0), None),
-  ("6 · reflection", "scene1-reflection.sdf",
+  ("6 · reflection", "scene1-reflection-room.sdf",
    dict(enable_shading=1, enable_shadows=1, enable_specular=1, enable_reflection=1), None),
-  ("7 · affine transform — sphere → ellipsoid", "scene2-matrix.sdf",
+  ("7 · affine transform — sphere → ellipsoid", "scene2-matrix-room.sdf",
    dict(enable_shading=1, enable_shadows=1, enable_specular=1, enable_reflection=1), None),
+  ("8 · spherical light — soft shadows", "scene3-spherelight.sdf",
+   dict(enable_shading=1, enable_shadows=1, enable_specular=1, enable_reflection=1,
+        shadow_samples=4), None),
+  ("9 · refraction — the ellipsoid goes 70% glass", "scene4-refraction.sdf",
+   dict(enable_shading=1, enable_shadows=1, enable_specular=1, enable_reflection=1,
+        enable_refraction=1, shadow_samples=4), None),
+  ("10 · checkered floor (40% reflective) & box", "scene5-checker-floor.sdf",
+   dict(enable_shading=1, enable_shadows=1, enable_specular=1, enable_reflection=1,
+        enable_refraction=1, shadow_samples=4), None),
+  ("11 · marble ellipsoid, box & floor", "scene6-marble.sdf",
+   dict(enable_shading=1, enable_shadows=1, enable_specular=1, enable_reflection=1,
+        enable_refraction=1, shadow_samples=4), None),
 ]
 
 def render_stage(scene, over, ambient, tag):
@@ -39,8 +60,8 @@ def render_stage(scene, over, ambient, tag):
     if ambient is not None:
         text = re.sub(r'amblight\s+\[[^\]]*\]', f'amblight [{ambient}, {ambient}, {ambient}]', text)
     open(f"/tmp/class_{tag}.sdf", "w").write(text)
-    cfg = dict(width=SIZE, height=SIZE, aa_samples=3,
-               max_bounces=6, enable_refraction=0)
+    cfg = dict(width=SIZE, height=SIZE, aa_samples=3, max_bounces=6,
+               enable_refraction=0, shadow_samples=0, dof_samples=0, seed=42)
     cfg.update(over)
     open(f"/tmp/class_{tag}.cfg", "w").write("".join(f"{k} {v}\n" for k, v in cfg.items()))
     subprocess.run([BIN, f"/tmp/class_{tag}.sdf", f"/tmp/class_{tag}.ppm", f"/tmp/class_{tag}.cfg"],
@@ -60,17 +81,27 @@ if __name__ == "__main__":
         frames.append(caption(render_stage(scene, over, amb, i), lab))
         print(f"  stage {i+1}/{len(STAGES)}: {lab}  ({time.time()-t0:.0f}s)", flush=True)
     secs = time.time() - t0
-    dur = [1600] * len(frames); dur[-1] = 3200          # linger on the finished scene
+    dur = [1600] * len(frames)
+    dur[7] = 2400   # pause where the class work ends (stage 8) ...
+    dur[-1] = 3200  # ... and linger on the finished scene
     frames[0].save(os.path.join(GALLERY, "01-class-progression.webp"), save_all=True,
                    append_images=frames[1:], duration=dur, loop=0, quality=90, method=6)
     card = dict(file="01-class-progression.webp",
         title="Building the renderer, feature by feature",
-        desc="The order it was implemented in class: a flat sphere from the given ray tracer, then "
-             "the box intersector, diffuse shading, shadows, specular highlights, reflection, and "
-             "finally an affine transform turning the sphere into an ellipsoid.",
+        desc="Stages 1-8 are the class work, in the order it was implemented: a flat sphere from "
+             "the given ray tracer, then the box and quad intersectors (raising the blocks and a "
+             "colored room: red in back, green right, cyan left, yellow behind the camera), diffuse "
+             "shading, shadows, specular highlights, reflection, an affine transform turning the "
+             "sphere into an ellipsoid, and a spherical light with soft shadows. Stages 9 and up "
+             "were added later: the ellipsoid re-ground as 70% glass, checkerboards on the floor "
+             "(40% reflective) and the box, and finally marble everywhere: pink on the ellipsoid, "
+             "purple on the box, and olive on the floor (ellipsoid and floor at a subtle 5% "
+             "reflectivity).",
         meta=f"{SIZE}x{SIZE}  -  {len(frames)} frames (animated WebP)  -  3x3 AA  -  "
+             f"4x4 soft-shadow samples on the later frames  -  "
              f"{fmt_time(secs)}, {secs/len(frames):.1f} s/frame")
-    write_section(1, "class", "Class Scenes",
-                  "The class scene built up one feature at a time - the progression each student "
-                  "worked through in EECS 204, as a single loop.", [card])
+    write_section(1, "class", "Feature Progression",
+                  "The renderer built up one feature at a time, as a single loop: stages 1-8 are "
+                  "the progression worked through in EECS 204; stages 9 and beyond were added "
+                  "later.", [card])
     build_index()
