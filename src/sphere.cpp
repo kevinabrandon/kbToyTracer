@@ -125,6 +125,7 @@ bool Sphere::Intersect( const Ray &ray, HitInfo &hitinfo ) const
     hitinfo.ray      = ray;
 	hitinfo.uv       = uv;
     hitinfo.object   = this;
+    hitinfo.material = &material;
     return true;
 }
 

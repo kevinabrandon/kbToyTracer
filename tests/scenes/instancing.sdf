@@ -1,0 +1,56 @@
+# define + instance regression scene: one prototype (a sphere on a box
+# pedestal, purple) placed four times.  Each instance composes convenience
+# transforms (translate / rotate / scale) and overrides materials; the
+# right-most instance is left untouched and must inherit the prototype's
+# purple.  Renders through BVH and List (see the @instancing-list variant).
+
+eye          (0.0, -8.0, 3.0)
+lookat       (0.0, 0.0, 0.8)
+up           (0.0, 0.0, 1.0)
+vpdist       2.5
+
+amblight     [0.2, 0.2, 0.2]
+bgcolor      [0.15, 0.25, 0.35]
+
+define widget
+begin BVH
+    sphere       (0, 0, 1.35) 0.6
+    box          (-0.5, -0.5, 0) (0.5, 0.5, 1.0)
+    diffuse      [0.8, 0.3, 0.8]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    10
+end
+
+begin BVH
+
+    point        (-3.0, -6.0, 10.0)
+    emission     [1, 1, 1]
+
+    # the floor
+    box          (-7, -4, -1) (7, 6, 0)
+    diffuse      [0.7, 0.7, 0.6]
+    specular     [0, 0, 0]
+    reflectivity 0
+    Phong_exp    0
+
+    instance     widget
+    translate    (-3.4, 0, 0)
+    diffuse      [0.9, 0.25, 0.2]
+
+    instance     widget
+    rotate       (0, 1, 0) 35
+    translate    (-1.2, 0.6, 0)
+    diffuse      [0.2, 0.6, 0.9]
+    reflectivity 0.3
+
+    instance     widget
+    scale        (0.7, 0.7, 1.4)
+    translate    (1.2, 0, 0)
+    diffuse      [0.3, 0.85, 0.35]
+
+    # untouched: must keep the prototype's purple
+    instance     widget
+    translate    (3.4, 0.6, 0)
+
+end

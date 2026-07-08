@@ -4,6 +4,8 @@ CLAUDE.local.md
 # Build artifacts and render outputs
 *.o
 *.obj
+# ... but Wavefront mesh models used by the golden tests are not object files
+!tests/scenes/models/*.obj
 *.exe
 *.ppm
 a.out
@@ -41,3 +43,4 @@ scenes/*
 !scenes/blurry.sdf
 !scenes/refract-focus.sdf
 !scenes/teapot-bvh-hq.sdf.gz
+!scenes/teapot-trio.sdf

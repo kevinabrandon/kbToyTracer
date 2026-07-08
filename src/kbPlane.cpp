@@ -75,6 +75,7 @@ bool Plane::Intersect( const Ray &ray, HitInfo &hitinfo ) const
 				hitinfo.normal = m_normal;
 				hitinfo.ray = ray;
 				hitinfo.object = this;
+				hitinfo.material = &material;
 				return true;
 			}
 		}

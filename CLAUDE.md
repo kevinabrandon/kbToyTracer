@@ -16,6 +16,14 @@ The scene decides *what* (lights, lens, materials); kbtoytracer.cfg decides
 *how well* (resolution, `aa_samples`, `dof_samples`, `shadow_samples`,
 `max_bounces`, `seed`). Use a nonzero `seed` for byte-reproducible renders.
 
+Scenes support instancing: `define <name>` names an aggregate as a prototype,
+`instance <name>` places it (shared geometry, per-instance transforms and
+materials), and `import <file> as <name>` makes a prototype from another
+.sdf/.sdf.gz scene (camera/lights skipped) or a Wavefront .obj mesh.
+Transforms compose in reading order: `matrix`, `translate`, `rotate`, `scale`.
+Emitters are not allowed inside a define; the reader (kbReader.cpp) owns all
+of this via its SceneReader.
+
 ## Tests
 
     make test                        # golden-image regression suite (~8s)
@@ -23,8 +31,9 @@ The scene decides *what* (lights, lens, materials); kbtoytracer.cfg decides
     python3 tests/run_tests.py --bless   # re-generate goldens (only after a
                                          # deliberate, reviewed rendering change)
 
-17 cases at 128x128 with seed=42 cover point/area lights, DoF, reflection,
-refraction, transparent shadows, AA modes, textures, and all three aggregates.
+24 cases at 128x128 with seed=42 cover point/area lights, DoF, reflection,
+refraction, transparent shadows, AA modes, textures, all three aggregates,
+define/instance, and sdf/obj imports.
 Renders must match tests/golden/ pixel-for-pixel; failures drop got/diff
 images in tests/failures/. Run this after any change to src/. Goldens are
 FP-sensitive, so bless them on the machine that runs the tests.

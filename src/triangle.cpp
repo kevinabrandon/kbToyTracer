@@ -128,6 +128,7 @@ bool Triangle::Intersect( const Ray &ray, HitInfo &hitinfo ) const
     hitinfo.normal   = N;
     hitinfo.ray      = ray;
     hitinfo.object   = this;
+    hitinfo.material = &material;
     return true;
     }
 

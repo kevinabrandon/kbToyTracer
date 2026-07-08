@@ -18,18 +18,18 @@ Byte-faithful to the archive except for C++17 portability fixes
 |---|---|
 | `Color.h`, `Mat3x3.h`, `Mat3x4.h`, `Vec2.h`, `Vec3.h` | untouched |
 | `point.cpp` | untouched |
-| `triangle.cpp` | one marked change: normal flipped to match kbToyTracer's winding convention |
-| `quad.cpp` | marked changes: normal flipped, `uv` defaulted |
+| `triangle.cpp` | marked changes: normal flipped to match kbToyTracer's winding convention; `HitInfo.material` stamp (instancing, 2026) |
+| `quad.cpp` | marked changes: normal flipped, `uv` defaulted, `HitInfo.material` stamp (2026) |
 | `util.cpp` | marked change: `rand()` rewritten thread-local so OpenMP rendering is race-free (2026) |
-| `box.cpp` | all Arvo code; KB restructuring only (declarations moved to `kbBox.h`, Arvo's handout ray-box intersector merged in) |
+| `box.cpp` | all Arvo code; KB restructuring only (declarations moved to `kbBox.h`, Arvo's handout ray-box intersector merged in), plus the `HitInfo.material` stamp (2026) |
 
 ## Mixed files (Arvo skeleton, KB extensions — see each header's `Provenance:` note)
 
 | File | KB additions |
 |---|---|
-| `toytracer.h` | `Lens` (depth of field), `Material` texture/refractivity fields, `HitInfo.uv`, `inside_ray` |
+| `toytracer.h` | `Lens` (depth of field), `Material` texture/refractivity fields + default ctor (2026), `HitInfo.uv`, `HitInfo.material`/`Mtl()` (instancing, 2026), `inside_ray` |
 | `Image.h` | PPM-reading constructor and `kbGetPixel` (for image textures) |
-| `sphere.cpp` | spherical uv coords; `GetSamples` solid-angle sampling of sphere lights (soft shadows) |
+| `sphere.cpp` | spherical uv coords; `GetSamples` solid-angle sampling of sphere lights (soft shadows); `HitInfo.material` stamp (2026) |
 | `list.cpp` | per-child affine transforms; declarations moved to `kbList.h` |
 
 ## Kevin's files (`kb` prefix)
@@ -39,6 +39,8 @@ thin-lens DoF, OpenMP), `kbShade.cpp` (shader: refraction, area lights, indirect
 `kbReader.cpp` (scene parser with textures/refraction), `kbConfig.*` (runtime settings, 2026),
 `kbRandom.*` (seedable per-thread RNG, 2026), `kbPng.*` (dependency-free PNG writer, 2026),
 `kbBVH.*`, `kbSpatialSub.*`, `kbPlane.cpp`, `kbList.h`, `kbBox.h`,
+`kbInstance.h` (shared-prototype instancing, 2026), `kbSmoothTriangle.*`
+(Phong-interpolated triangle, 2026), `kbObjImport.*` (Wavefront obj loader, 2026),
 `kbTexture.h` + `kbCheckerTex.h`, `kbStripeTex.h`, `kbDefaultTex.h`, `kbMarbleTex.*`,
 `kbImageTex.*`, and `kbSolidNoise.*` (Perlin-style noise after Shirley & Morley).
 

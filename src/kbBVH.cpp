@@ -86,6 +86,7 @@ static bool hitChild( List_node *node, const Ray &ray, HitInfo &hitinfo )
     hitinfo.ray           = ray;   // whole ray incl. .type (was dropping type -> broke refraction on transforms)
     hitinfo.normal        = Unit( Inverse( Transpose( node->matrix.mat ) ) * temp.normal );
     hitinfo.object        = temp.object;
+    hitinfo.material      = temp.material;
     hitinfo.uv            = temp.uv;
     return true;
 }

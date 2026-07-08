@@ -127,6 +127,7 @@ bool Box::Intersect( const Ray &ray, HitInfo &hitinfo ) const
     hitinfo.normal   = N;
     hitinfo.ray      = ray;
     hitinfo.object   = this;
+    hitinfo.material = &material;
     return true;
     }
 int Box::GetSamples( const Vec3 &P, const Vec3 &N, Sample *samples, int n ) const

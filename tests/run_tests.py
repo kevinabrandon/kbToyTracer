@@ -100,6 +100,22 @@ CASES = [
     # historical exhibit (see PROVENANCE.md): it does not support transforms
     # and warns if a scene tries. Its supported subset is pinned by
     # aggregate-ssub above.
+    ("instancing",             "tests/instancing.sdf",         {},
+     "define + instance: one prototype placed four times through the BVH with "
+     "composed translate/rotate/scale lines and per-instance materials; the "
+     "right-most instance is untouched and must inherit the prototype's purple."),
+    ("instancing-list",        "@instancing-list",             {},
+     "The same instancing scene through the brute-force List aggregate: pins "
+     "the material copy-back in List's transformed-child intersection path. "
+     "Golden is identical to the BVH version."),
+    ("import-sdf",             "tests/import-sdf.sdf",         {},
+     "import <file> as <name>: the octahedral gem model (a standalone sdf with "
+     "its own camera and light, both skipped with warnings) instanced three "
+     "times -- untouched yellow, squashed red, stretched reflective blue."),
+    ("import-obj",             "tests/import-obj.sdf",         {},
+     "Wavefront obj import: a quad-faced cube (fan triangulation, flat "
+     "shading) and an icosphere with vertex normals (smooth kbSmoothTriangle "
+     "shading, incl. under non-uniform scale), each instanced twice."),
 ]
 
 def make_scene(tag, tmpdir):
@@ -110,6 +126,7 @@ def make_scene(tag, tmpdir):
         "@rotated-list": ("tests/rotated.sdf",     "List", "List"),
         "@rotated-bvh":  ("tests/rotated.sdf",     "List", "BVH"),
         "@rotated-ssub": ("tests/rotated.sdf",     "List", "SSub"),
+        "@instancing-list": ("tests/instancing.sdf", "BVH", "List"),
     }[tag]
     src = open(scene_path(base, tmpdir)).read()
     path = os.path.join(tmpdir, tag[1:] + ".sdf")

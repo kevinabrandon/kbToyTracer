@@ -104,6 +104,7 @@ bool Quad::Intersect( const Ray &ray, HitInfo &hitinfo ) const
     hitinfo.normal   = -N;  // (KB: flipped to match kbToyTracer's winding convention.)
     hitinfo.ray      = ray;
     hitinfo.object   = this;
+    hitinfo.material = &material;
     hitinfo.uv       = Vec2();  // (KB: quads carry no texture parameterization yet.)
     return true;
     }

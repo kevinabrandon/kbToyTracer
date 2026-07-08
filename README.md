@@ -58,10 +58,18 @@ Two things worth understanding:
 
 - **The scene format** (`scenes/*.sdf`) is plain text. A scene picks an aggregate
   (`begin List` / `begin SSub` / `begin BVH`), places lights (`point` objects with
-  `emission`) and primitives (`sphere`, `box`, `triangle`, `quad`, `plane`), each followed
-  by its material (`diffuse`, `specular`, `reflectivity`, `refractivity`, `index_refract`,
-  `Phong_exp`, `emission`) and optional `matrix` (a 3×4 affine transform) or texture. Open
-  `scenes/scene1-reflection.sdf` — it's a dozen readable lines.
+  `emission`) and primitives (`sphere`, `box`, `triangle`, `quad`, `plane`,
+  `smooth_triangle`), each followed by its material (`diffuse`, `specular`,
+  `reflectivity`, `refractivity`, `index_refract`, `Phong_exp`, `emission`) and optional
+  transforms (`matrix` — a 3×4 affine — or the composable `translate`, `rotate`, `scale`)
+  or texture. Open `scenes/scene1-reflection.sdf` — it's a dozen readable lines.
+- **Instancing and imports.** `define <name>` wraps an aggregate into a named prototype;
+  `instance <name>` places it (any number of times — the geometry is shared, not copied),
+  followed by its own transforms and material overrides. An untouched instance keeps the
+  prototype's material. `import <file> as <name>` turns another scene's geometry — a
+  `.sdf`, gzipped `.sdf.gz`, or Wavefront `.obj` (with smooth vertex normals) — into a
+  prototype the same way; the imported file's camera and lights are ignored. See
+  `tests/scenes/instancing.sdf` and `tests/scenes/import-obj.sdf` for working examples.
 - **The config** (`kbtoytracer.cfg`) holds the render *quality* settings; the scene decides
   *what* is rendered. If a scene defines a lens you get depth of field; if it has an area
   light (an emissive sphere or quad) you get soft shadows -- the config just sets the sample
@@ -71,10 +79,15 @@ Two things worth understanding:
 
 ## Features
 
-- **Primitives:** sphere, box, triangle, quad, plane; point lights as emissive points
+- **Primitives:** sphere, box, triangle, quad, plane, smooth (Phong-shaded) triangle;
+  point lights as emissive points
 - **Materials:** Lambertian diffuse, specular highlights, mirror reflection, Snell-law
   refraction with total internal reflection
-- **Transforms:** any primitive can carry a 3×4 affine `matrix` (spheres → ellipsoids, etc.)
+- **Transforms:** any primitive can carry a 3×4 affine `matrix` (spheres → ellipsoids, etc.),
+  or composable `translate` / `rotate` / `scale` lines
+- **Instancing:** `define`/`instance` place shared geometry many times with per-instance
+  transforms and materials; `import ... as` pulls in other `.sdf`(`.gz`) scenes or
+  Wavefront `.obj` meshes as instancing prototypes
 - **Lighting:** point lights, and **area lights** with Monte-Carlo soft shadows
 - **Textures:** image maps, procedural marble (Perlin solid noise), checker, stripe
 - **Camera:** thin-lens **depth of field** (Monte-Carlo aperture sampling)
