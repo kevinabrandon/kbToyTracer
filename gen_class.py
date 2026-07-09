@@ -7,9 +7,11 @@ shadows, specular highlights, reflection, an affine transform, and a spherical a
 light with soft shadows. Stages 9 on were added later (2026): 70% refractive glass,
 checkerboards on the floor (40% reflective) and the box, and finally everything
 re-ground in marble -- pink ellipsoid, purple box, olive floor (ellipsoid and floor
-at a subtle 5% reflectivity). Stage 12 shows off import/instance: the marble
-ellipsoid and box hand their spots (and their marble) to the imported Utah teapot
-and Lucy, with a gold Stanford dragon sitting in front of them both.
+at a subtle 5% reflectivity). Stage 12 shows off import/instance: the imported Utah
+teapot takes the ellipsoid's spot (keeping its pink marble, polished up to 30%
+reflective), Lucy stands on the box's footprint as a white marble statue with thin
+wispy gray veins, a gold Stanford dragon sits to her right, and the floor goes back
+to its stage-10 checkerboard.
 
 (scenes/scene7-dof.sdf adds a thin lens on top of the final stage; it's parked
 outside the progression until the scene has an object near the viewport to sell
@@ -110,11 +112,12 @@ if __name__ == "__main__":
              "were added later: the ellipsoid re-ground as 70% glass, checkerboards on the floor "
              "(40% reflective) and the box, and finally marble everywhere: pink on the ellipsoid, "
              "purple on the box, and olive on the floor (ellipsoid and floor at a subtle 5% "
-             "reflectivity). The last stage shows off import/instance: the pink-marble ellipsoid "
-             "hands its spot to the imported Utah teapot (229k triangles), the purple-marble box "
-             "hands its footprint to Lucy (100k), and a gold Stanford dragon (871k) sits in front "
-             "of them both -- each mesh imported once and placed with per-instance transforms and "
-             "materials.",
+             "reflectivity). The last stage shows off import/instance: the imported Utah teapot "
+             "(229k triangles) takes the ellipsoid's spot in its pink marble, polished up to 30% "
+             "reflective, Lucy (100k) stands on the box's footprint as a white marble statue with "
+             "thin wispy gray veins, a gold Stanford dragon (871k) sits to her right, and the "
+             "floor goes back to its stage-10 checkerboard -- each mesh imported once and placed "
+             "with per-instance transforms and materials.",
         meta=f"{SIZE}x{SIZE}  -  {len(frames)} frames (animated WebP)  -  3x3 AA  -  "
              f"4x4 soft-shadow samples on the later frames  -  "
              f"{fmt_time(secs)}, {secs/len(frames):.1f} s/frame")

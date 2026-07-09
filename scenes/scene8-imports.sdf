@@ -1,10 +1,11 @@
 # The class scene, stage 12: the imported models move in. Builds on
-# scene6-marble.sdf -- same room, spherical light, and olive marble floor,
-# but the classic occupants are replaced by imported meshes: the Utah
-# teapot (229k triangles) takes the ellipsoid's spot in its pink marble,
-# Lucy (100k triangles) stands on the box's footprint in its purple
-# marble, and a gold Stanford dragon (871k triangles) sits in front of
-# them both. One shared BVH per prototype; see teapot-trio.sdf,
+# scene6-marble.sdf -- same room and spherical light, with the floor back
+# in its stage-10 checkerboard (40% reflective). The classic occupants are
+# replaced by imported meshes: the Utah teapot (229k triangles) takes the
+# ellipsoid's spot in its pink marble (30% reflective), Lucy (100k
+# triangles) stands on the box's footprint as a white marble statue with
+# thin wispy gray veining, and a gold Stanford dragon (871k triangles)
+# sits to her right. One shared BVH per prototype; see teapot-trio.sdf,
 # lucy.sdf, and dragon.sdf for the canonical import transforms.
 #
 # NOTE textures are sticky and can't be un-set, so the untextured gold
@@ -67,45 +68,47 @@ begin BVH
     reflectivity 0
     Phong_exp    0
 
-    ## The dragon, gold, in front of the others (before any marble line
-    ## so it doesn't inherit a sticky texture).
+    ## The dragon, gold, to Lucy's right (before any texture line so it
+    ## doesn't inherit a sticky one).
 
     instance     dragon
     rotate       (1, 0, 0) 90
     translate    (0, 0, 0.283)
     scale        1.4
     rotate       (0, 0, 1) 130
-    translate    (1.4, 0.3, -1)
+    translate    (0.8, 2.4, -1)
     diffuse      [0.85, 0.65, 0.2]
     specular     [1.0, 0.9, 0.6]
     refractivity 0
     reflectivity 0.18
     Phong_exp    40
 
-    ## The floor: olive marble, 5% reflective.
+    ## The floor: checkered (1x1-unit checks) and 40% reflective, as in
+    ## stage 10.
 
     box          (-4, -6, -2) (4, 6, -1)
     diffuse      [1, 1, 1]
-    marble       [0.90, 0.92, 0.78] [0.84, 0.87, 0.63] [0.30, 0.34, 0.18] 0.3 5.0 8
+    checkerTex   [0.84, 0.87, 0.63] [0.25, 0.28, 0.20] 0.5
     specular     [1, 1, 1]
     refractivity 0
-    reflectivity 0.05
+    reflectivity 0.40
     Phong_exp    0
 
-    ## The teapot in the ellipsoid's spot, in the ellipsoid's pink marble.
+    ## The teapot in the ellipsoid's spot, in the ellipsoid's pink marble,
+    ## polished up to 30% reflective.
 
     instance     teapot
     scale        0.45
-    rotate       (0, 0, 1) 60
+    rotate       (0, 0, 1) 30
     translate    (0.15, 0.25, -1.05)
     diffuse      [1, 1, 1]
     marble       [0.98, 0.88, 0.82] [0.96, 0.65, 0.58] [0.45, 0.18, 0.15] 0.3 5.0 8
     specular     [1.00, 0.85, 0.75]
     refractivity 0
-    reflectivity 0.05
+    reflectivity 0.30
     Phong_exp    15
 
-    ## Lucy on the box's footprint, in the box's purple marble.
+    ## Lucy on the box's footprint: white marble with thin wispy gray veins.
 
     instance     lucy
     translate    (-691, 121, 606)
@@ -113,7 +116,7 @@ begin BVH
     rotate       (0, 0, 1) -136
     translate    (0, 1.6, -1)
     diffuse      [1, 1, 1]
-    marble       [0.78, 0.77, 0.96] [0.54, 0.53, 0.87] [0.18, 0.17, 0.45] 0.8 2.5 6
+    marble       [0.97, 0.97, 0.95] [0.94, 0.94, 0.92] [0.40, 0.40, 0.44] 0.8 4.0 8
     specular     [1, 1, 1]
     refractivity 0
     reflectivity 0
