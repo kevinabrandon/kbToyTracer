@@ -7,7 +7,12 @@ shadows, specular highlights, reflection, an affine transform, and a spherical a
 light with soft shadows. Stages 9 on were added later (2026): 70% refractive glass,
 checkerboards on the floor (40% reflective) and the box, and finally everything
 re-ground in marble -- pink ellipsoid, purple box, olive floor (ellipsoid and floor
-at a subtle 5% reflectivity).
+at a subtle 5% reflectivity). Stage 12 shows off import/instance: a gold Stanford
+dragon sits up front, the imported Utah teapot sits behind it in the ellipsoid's
+pink marble (polished up to 30% reflective, its belly catching a distorted
+reflection of the dragon), Lucy stands in the back corner as a weathered white-marble
+statue with soft cloudy gray mottling, and the floor goes back to its stage-10
+checkerboard at half the reflectivity.
 
 (scenes/scene7-dof.sdf adds a thin lens on top of the final stage; it's parked
 outside the progression until the scene has an object near the viewport to sell
@@ -53,20 +58,32 @@ STAGES = [
   ("11 · marble ellipsoid, box & floor", "scene6-marble.sdf",
    dict(enable_shading=1, enable_shadows=1, enable_specular=1, enable_reflection=1,
         enable_refraction=1, shadow_samples=4), None),
+  ("12 · import & instance — the models move in", "scene8-imports.sdf",
+   dict(enable_shading=1, enable_shadows=1, enable_specular=1, enable_reflection=1,
+        enable_refraction=1, shadow_samples=4), None),
 ]
 
 def render_stage(scene, over, ambient, tag):
-    text = open(os.path.join(SCENES, scene)).read().replace("\r", "")
+    # Render the scene in place so relative imports resolve; only the
+    # ambient-boosted stages get a rewritten copy (written next to the
+    # scene, for the same reason).
+    scene_path = os.path.join(SCENES, scene)
+    tmp_scene = None
     if ambient is not None:
+        text = open(scene_path).read().replace("\r", "")
         text = re.sub(r'amblight\s+\[[^\]]*\]', f'amblight [{ambient}, {ambient}, {ambient}]', text)
-    open(f"/tmp/class_{tag}.sdf", "w").write(text)
+        tmp_scene = scene_path + f".class_{tag}.tmp.sdf"
+        open(tmp_scene, "w").write(text)
+        scene_path = tmp_scene
     cfg = dict(width=SIZE, height=SIZE, aa_samples=3, max_bounces=6,
                enable_refraction=0, shadow_samples=0, dof_samples=0, seed=42)
     cfg.update(over)
     open(f"/tmp/class_{tag}.cfg", "w").write("".join(f"{k} {v}\n" for k, v in cfg.items()))
-    subprocess.run([BIN, f"/tmp/class_{tag}.sdf", f"/tmp/class_{tag}.ppm", f"/tmp/class_{tag}.cfg"],
+    subprocess.run([BIN, scene_path, f"/tmp/class_{tag}.ppm", f"/tmp/class_{tag}.cfg"],
                    env={**os.environ, "OMP_NUM_THREADS": THREADS},
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if tmp_scene is not None:
+        os.remove(tmp_scene)
     return Image.open(f"/tmp/class_{tag}.ppm").convert("RGB")
 
 def caption(img, text):
@@ -96,7 +113,13 @@ if __name__ == "__main__":
              "were added later: the ellipsoid re-ground as 70% glass, checkerboards on the floor "
              "(40% reflective) and the box, and finally marble everywhere: pink on the ellipsoid, "
              "purple on the box, and olive on the floor (ellipsoid and floor at a subtle 5% "
-             "reflectivity).",
+             "reflectivity). The last stage shows off import/instance: a gold Stanford dragon "
+             "(871k triangles) sits up front, the imported Utah teapot (229k) sits behind it in "
+             "the ellipsoid's pink marble, polished up to 30% reflective so its belly catches a "
+             "distorted reflection of the dragon, Lucy (100k) stands in the back corner as a "
+             "weathered white-marble statue with soft cloudy gray mottling, and the floor goes "
+             "back to its stage-10 checkerboard at half the reflectivity -- each mesh imported "
+             "once and placed with per-instance transforms and materials.",
         meta=f"{SIZE}x{SIZE}  -  {len(frames)} frames (animated WebP)  -  3x3 AA  -  "
              f"4x4 soft-shadow samples on the later frames  -  "
              f"{fmt_time(secs)}, {secs/len(frames):.1f} s/frame")

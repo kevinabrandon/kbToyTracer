@@ -439,7 +439,7 @@ bool SceneReader::ReadFile( const std::string &path, bool import_mode, Object **
         if( Get( input_line, "specular"     , c ) ) { cur->material.specular      = agg->material.specular      = c; MarkInstanceOverride( cur ); continue; }
         if( Get( input_line, "reflectivity" , s ) ) { cur->material.reflectivity  = agg->material.reflectivity  = s; MarkInstanceOverride( cur ); continue; }
         if( Get( input_line, "Phong_exp"    , s ) ) { cur->material.Phong_exp     = agg->material.Phong_exp     = s; MarkInstanceOverride( cur ); continue; }
-		if( Get( input_line, "refractivity" , s ) ) { cur->material.refractivity  = agg->material.reflectivity  = s; MarkInstanceOverride( cur ); continue; }
+		if( Get( input_line, "refractivity" , s ) ) { cur->material.refractivity  = agg->material.refractivity  = s; MarkInstanceOverride( cur ); continue; }
 		if( Get( input_line, "index_refract", s ) ) { cur->material.index_refract = agg->material.index_refract = s; MarkInstanceOverride( cur ); continue; }
 		if( Get( input_line, "stripeTex", c1, c2, s ) )
 		{

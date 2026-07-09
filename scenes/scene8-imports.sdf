@@ -1,0 +1,128 @@
+# The class scene, stage 12: the imported models move in. Builds on
+# scene6-marble.sdf -- same room and spherical light, with the floor back
+# in its stage-10 checkerboard at half its old reflectivity (20%). The
+# classic occupants are replaced by imported meshes: the gold Stanford
+# dragon (871k triangles) sits up front, the Utah teapot (229k triangles)
+# sits behind it in the ellipsoid's pink marble (30% reflective), its
+# belly catching a distorted reflection of the dragon, and Lucy (100k
+# triangles) stands in the room's back corner as a weathered white-marble
+# statue with soft cloudy gray mottling. One shared BVH per prototype; see
+# teapot-trio.sdf, lucy.sdf, and dragon.sdf for the canonical import
+# transforms.
+#
+# NOTE textures are sticky and can't be un-set, so the untextured gold
+# dragon comes before the marble objects. The teapot model carries its
+# own 8x8 floor of quads at z=0, so its instance is sunk 0.05 below the
+# room's floor top (z=-1) to hide it inside the floor box.
+
+eye          (5.0,-2.0, 2.8)
+lookat       (0.0, 1.1, 0.25)
+up           (0.0, 0.0, 1.0)
+vpdist       2.75
+
+amblight     [0.2, 0.2, 0.2]
+bgcolor      [0.15, 0.25, 0.35]
+
+import teapot-bvh-hq.sdf.gz as teapot
+import models/lucy.obj.gz as lucy
+import models/dragon.obj.gz as dragon
+
+begin BVH
+
+    ## Spherical light source (soft shadows when shadow_samples > 0).
+
+    sphere       (-1.5, -2.0, 6.0) 1.0
+    diffuse      [1, 1, 1]
+    emission     [3, 3, 3]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+    ## The colored room (from the 2004/5 lens scenes): red wall in back,
+    ## green to the right, cyan to the left (out of direct view), and a
+    ## half-height yellow wall behind the camera, which looks over it.
+
+    quad         (-4, 6, -1) (-4, 6, 4) (-4, -6, 4) (-4, -6, -1)
+    diffuse      [1, 0, 0]
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    0
+
+    quad         (4, 6, -1) (4, 6, 4) (-4, 6, 4) (-4, 6, -1)
+    diffuse      [0, 1, 0]
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    0
+
+    quad         (-4, -6, -1) (-4, -6, 4) (4, -6, 4) (4, -6, -1)
+    diffuse      [0, 1, 1]
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    0
+
+    quad         (4, -6, -1) (4, -6, 1) (4, 6, 1) (4, 6, -1)
+    diffuse      [1, 1, 0]
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    0
+
+    ## The dragon, gold, up front (before any texture line so it doesn't
+    ## inherit a sticky one).
+
+    instance     dragon
+    rotate       (1, 0, 0) 90
+    translate    (0, 0, 0.283)
+    scale        1.8
+    rotate       (0, 0, 1) 130
+    translate    (0.7, 0.2, -1)
+    diffuse      [0.85, 0.65, 0.2]
+    specular     [1.0, 0.9, 0.6]
+    refractivity 0
+    reflectivity 0.18
+    Phong_exp    40
+
+    ## The floor: checkered (1x1-unit checks) as in stage 10, at half
+    ## its reflectivity (20%).
+
+    box          (-4, -6, -2) (4, 6, -1)
+    diffuse      [1, 1, 1]
+    checkerTex   [0.84, 0.87, 0.63] [0.25, 0.28, 0.20] 0.5
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0.20
+    Phong_exp    0
+
+    ## The teapot behind the dragon, in the ellipsoid's pink marble,
+    ## polished up to 30% reflective so its belly catches the dragon.
+
+    instance     teapot
+    scale        0.45
+    rotate       (0, 0, 1) 30
+    translate    (-0.8, 1.9, -1.05)
+    diffuse      [1, 1, 1]
+    marble       [0.98, 0.88, 0.82] [0.96, 0.65, 0.58] [0.45, 0.18, 0.15] 0.3 5.0 8
+    specular     [1.00, 0.85, 0.75]
+    refractivity 0
+    reflectivity 0.30
+    Phong_exp    15
+
+    ## Lucy in the back corner: weathered white marble, softly clouded
+    ## (the huge turbulence dissolves the sine bands into mottling).
+
+    instance     lucy
+    translate    (-691, 121, 606)
+    scale        0.00224
+    rotate       (0, 0, 1) -136
+    translate    (-2.3, 4.0, -1)
+    diffuse      [1, 1, 1]
+    marble       [0.96, 0.95, 0.92] [0.90, 0.89, 0.86] [0.55, 0.57, 0.60] 0.55 10 6
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    12
+
+end
