@@ -9,7 +9,7 @@ already-rendered sections untouched).
 import subprocess, sys, os, glob
 HERE = os.path.dirname(os.path.abspath(__file__))
 SECTIONS = ["gen_class.py", "gen_spheres_ellipsoids.py", "gen_arealights.py",
-            "gen_refraction.py", "gen_teapot.py"]
+            "gen_refraction.py", "gen_teapot.py", "gen_dof.py"]
 
 # Full rebuild: clear previously rendered images/animations and section manifests first.
 for pat in ("gallery/*.png", "gallery/*.gif", "gallery/*.webp", "gallery/sections/*.json"):

@@ -12,11 +12,13 @@ dragon sits up front, the imported Utah teapot sits behind it in the ellipsoid's
 pink marble (polished up to 30% reflective, its belly catching a distorted
 reflection of the dragon), Lucy stands in the back corner as a weathered white-marble
 statue with soft cloudy gray mottling, and the floor goes back to its stage-10
-checkerboard at half the reflectivity.
+checkerboard at half the reflectivity. Stage 13 puts a thin lens on the camera
+(scenes/dof-dragon.sdf): focus on the teapot, the dragon soft in front, Lucy
+softer behind.
 
-(scenes/scene7-dof.sdf adds a thin lens on top of the final stage; it's parked
-outside the progression until the scene has an object near the viewport to sell
-the blur.)
+(scenes/scene7-dof.sdf was an earlier thin-lens experiment on the marble stage;
+it stays parked outside the progression -- the imported models finally gave the
+blur something to sell it.)
 
 The two "flat" stages have no lighting model, so their ambient is boosted to 1.0 to
 show the raw material color (the scene's real ambient is 0.2, used once shading is on)."""
@@ -61,6 +63,9 @@ STAGES = [
   ("12 · import & instance — the models move in", "scene8-imports.sdf",
    dict(enable_shading=1, enable_shadows=1, enable_specular=1, enable_reflection=1,
         enable_refraction=1, shadow_samples=4), None),
+  ("13 · depth of field — focus on the teapot", "dof-dragon.sdf",
+   dict(enable_shading=1, enable_shadows=1, enable_specular=1, enable_reflection=1,
+        enable_refraction=1, shadow_samples=4, dof_samples=4), None),
 ]
 
 def render_stage(scene, over, ambient, tag):
@@ -119,9 +124,11 @@ if __name__ == "__main__":
              "distorted reflection of the dragon, Lucy (100k) stands in the back corner as a "
              "weathered white-marble statue with soft cloudy gray mottling, and the floor goes "
              "back to its stage-10 checkerboard at half the reflectivity -- each mesh imported "
-             "once and placed with per-instance transforms and materials.",
+             "once and placed with per-instance transforms and materials. The final stage adds "
+             "a thin lens (lensRadius 0.21) focused on the teapot: the dragon goes soft in the "
+             "foreground and Lucy blurs behind.",
         meta=f"{SIZE}x{SIZE}  -  {len(frames)} frames (animated WebP)  -  3x3 AA  -  "
-             f"4x4 soft-shadow samples on the later frames  -  "
+             f"4x4 soft-shadow samples on the later frames, 4x4 lens samples on the last  -  "
              f"{fmt_time(secs)}, {secs/len(frames):.1f} s/frame")
     write_section(1, "class", "Feature Progression",
                   "The renderer built up one feature at a time, as a single loop: stages 1-8 are "
