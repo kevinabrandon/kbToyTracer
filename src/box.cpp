@@ -119,6 +119,15 @@ bool Box::Intersect( const Ray &ray, HitInfo &hitinfo ) const
         }
     if( min > max ) return false; // Degenerate interval.
 
+    // If the ray originates inside the box there is no entry face: no slab
+    // ever raised "min" above its starting value, so N was never assigned.
+    // Reporting that as a hit would place it at t=0 with a zero normal,
+    // which turns into NaN in the shader (and a black pixel).  Treat it as
+    // a miss instead -- a solid box has no visible interior.  (If boxes are
+    // ever made refractive, this must return the exit face with an inward
+    // normal instead.)
+    if( min <= 0.0 ) return false;
+
     // We have an actual hit.  Fill in all the geometric information so
     // that the shader can shade this point.  Compute the point of
     // intersection using the ray and the distance to the point along

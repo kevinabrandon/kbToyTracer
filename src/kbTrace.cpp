@@ -20,6 +20,7 @@
 #include "kbRandom.h"
 #include "kbPng.h"
 #include <chrono>
+#include <cmath>
 
 
 static unsigned long
@@ -86,6 +87,11 @@ bool Cast( const Ray &ray, const Scene &scene, HitInfo &hitinfo )
 
 Pixel ToneMap( const Color &color )
     {
+    // Backstop: a NaN channel would cast to INT_MIN below and slip past the
+    // clamps as pure black, hiding the bug as pepper noise. Flag it magenta
+    // so a shading NaN is loud in the image instead of a black speck.
+    if( !std::isfinite( color.red + color.green + color.blue ) )
+        return Pixel( 255, 0, 255 );
     int red   = (int)floor( 256 * color.red   );
     int green = (int)floor( 256 * color.green );
     int blue  = (int)floor( 256 * color.blue  );
