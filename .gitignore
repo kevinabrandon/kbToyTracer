@@ -15,8 +15,10 @@ __pycache__/
 *.pyc
 
 # Tooling and assets not needed to run the gallery (kept locally, not published
-# here)
-tools/
+# here) -- except kbSPD, the revived SPD scene generators, which build and run
+# anywhere (kbSPD/.gitignore keeps its binaries out)
+tools/*
+!tools/kbSPD/
 assets/
 legacy/
 
