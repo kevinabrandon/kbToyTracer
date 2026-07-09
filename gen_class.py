@@ -10,9 +10,9 @@ re-ground in marble -- pink ellipsoid, purple box, olive floor (ellipsoid and fl
 at a subtle 5% reflectivity). Stage 12 shows off import/instance: a gold Stanford
 dragon sits up front, the imported Utah teapot sits behind it in the ellipsoid's
 pink marble (polished up to 30% reflective, its belly catching a distorted
-reflection of the dragon), Lucy stands in the back corner as a white marble statue
-with thin wispy gray veins, and the floor goes back to its stage-10 checkerboard
-at half the reflectivity.
+reflection of the dragon), Lucy stands in the back corner as a weathered white-marble
+statue with soft cloudy gray mottling, and the floor goes back to its stage-10
+checkerboard at half the reflectivity.
 
 (scenes/scene7-dof.sdf adds a thin lens on top of the final stage; it's parked
 outside the progression until the scene has an object near the viewport to sell
@@ -117,9 +117,9 @@ if __name__ == "__main__":
              "(871k triangles) sits up front, the imported Utah teapot (229k) sits behind it in "
              "the ellipsoid's pink marble, polished up to 30% reflective so its belly catches a "
              "distorted reflection of the dragon, Lucy (100k) stands in the back corner as a "
-             "white marble statue with thin wispy gray veins, and the floor goes back to its "
-             "stage-10 checkerboard at half the reflectivity -- each mesh imported once and "
-             "placed with per-instance transforms and materials.",
+             "weathered white-marble statue with soft cloudy gray mottling, and the floor goes "
+             "back to its stage-10 checkerboard at half the reflectivity -- each mesh imported "
+             "once and placed with per-instance transforms and materials.",
         meta=f"{SIZE}x{SIZE}  -  {len(frames)} frames (animated WebP)  -  3x3 AA  -  "
              f"4x4 soft-shadow samples on the later frames  -  "
              f"{fmt_time(secs)}, {secs/len(frames):.1f} s/frame")

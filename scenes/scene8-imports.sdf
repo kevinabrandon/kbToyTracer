@@ -5,8 +5,8 @@
 # dragon (871k triangles) sits up front, the Utah teapot (229k triangles)
 # sits behind it in the ellipsoid's pink marble (30% reflective), its
 # belly catching a distorted reflection of the dragon, and Lucy (100k
-# triangles) stands in the room's back corner as a white marble statue
-# with thin wispy gray veining. One shared BVH per prototype; see
+# triangles) stands in the room's back corner as a weathered white-marble
+# statue with soft cloudy gray mottling. One shared BVH per prototype; see
 # teapot-trio.sdf, lucy.sdf, and dragon.sdf for the canonical import
 # transforms.
 #
@@ -78,7 +78,7 @@ begin BVH
     translate    (0, 0, 0.283)
     scale        1.8
     rotate       (0, 0, 1) 130
-    translate    (-0.3, 1.2, -1)
+    translate    (0.7, 0.2, -1)
     diffuse      [0.85, 0.65, 0.2]
     specular     [1.0, 0.9, 0.6]
     refractivity 0
@@ -102,7 +102,7 @@ begin BVH
     instance     teapot
     scale        0.45
     rotate       (0, 0, 1) 30
-    translate    (-1.3, 2.4, -1.05)
+    translate    (-0.8, 1.9, -1.05)
     diffuse      [1, 1, 1]
     marble       [0.98, 0.88, 0.82] [0.96, 0.65, 0.58] [0.45, 0.18, 0.15] 0.3 5.0 8
     specular     [1.00, 0.85, 0.75]
@@ -110,15 +110,16 @@ begin BVH
     reflectivity 0.30
     Phong_exp    15
 
-    ## Lucy in the back corner: white marble with thin wispy gray veins.
+    ## Lucy in the back corner: weathered white marble, softly clouded
+    ## (the huge turbulence dissolves the sine bands into mottling).
 
     instance     lucy
     translate    (-691, 121, 606)
-    scale        0.001867
+    scale        0.00224
     rotate       (0, 0, 1) -136
-    translate    (-2.8, 4.5, -1)
+    translate    (-2.3, 4.0, -1)
     diffuse      [1, 1, 1]
-    marble       [0.97, 0.97, 0.95] [0.94, 0.94, 0.92] [0.40, 0.40, 0.44] 0.8 4.0 8
+    marble       [0.96, 0.95, 0.92] [0.90, 0.89, 0.86] [0.55, 0.57, 0.60] 0.55 10 6
     specular     [1, 1, 1]
     refractivity 0
     reflectivity 0
