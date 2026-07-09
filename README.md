@@ -9,6 +9,9 @@ bounding volume hierarchy. In 2026 I recovered it from an old CD and got it buil
 rendering again on Linux.
 
 <p align="center">
+  <img src="gallery/60-dof-rack.webp" width="66%" alt="A thin-lens camera racking focus across the Stanford dragon, the Utah teapot, and Lucy">
+</p>
+<p align="center">
   <img src="gallery/01-class-progression.webp" width="32%" alt="Building the renderer, feature by feature">
   <img src="gallery/41-glass-morph.webp" width="32%" alt="A glass sphere morphing into a lens">
   <img src="gallery/50-teapot.png" width="32%" alt="A reflective 229k-triangle teapot">
@@ -48,6 +51,7 @@ script each, all sharing `gallery_lib.py`:
 | `gen_spheres_ellipsoids.py` | 200 spheres → ellipsoids → reflective → refractive glass, in a colored room |
 | `gen_refraction.py` | A glass sphere: a depth-of-field focus rack and a sphere → lens morph |
 | `gen_teapot.py` | A 229,921-triangle teapot, traced through the BVH |
+| `gen_dof.py` | A thin lens racking focus across the dragon, the teapot, and Lucy |
 
 Each script is a short list of `(scene, title, config-overrides)` tuples. Reading one shows
 you exactly which config knobs produce which effect, and each rendered card reports the

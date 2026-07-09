@@ -1,0 +1,13 @@
+{
+ "order": 6,
+ "title": "Depth of Field",
+ "blurb": "The thin-lens camera on the imported-model scene: a focus rack across the three meshes. The scene defines the lens (lensRadius, focalDist); the config only sets how many rays sample the aperture.",
+ "cards": [
+  {
+   "file": "60-dof-rack.webp",
+   "title": "Focus rack: dragon, teapot, Lucy",
+   "desc": "A thin-lens camera (lensRadius 0.21) racking focus through the imported-model scene: the gold Stanford dragon up front, the pink-marble teapot mid-field, and Lucy in the back corner, each snapping into focus in turn while the others melt into bokeh.",
+   "meta": "480x480  -  17 frames (animated WebP)  -  10x10 lens samples/pixel  -  11 min 18 s, 39.9 s/frame"
+  }
+ ]
+}
