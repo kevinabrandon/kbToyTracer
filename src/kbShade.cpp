@@ -31,13 +31,19 @@
 int SampleProjectedHemisphere(const Vec3 &P, const Vec3 &N, Sample *samples, const int n);
 
 // computes the color/radiance from only the direct light
-Color DirectLight	 ( const HitInfo &hit, const Scene &scene, const Object &light, const Vec3 &movedPoint, int max_tree_depth );
+// The light-shading functions return the diffuse/shadow contribution; a Phong
+// highlight on a REFRACTIVE surface is diverted into 'deferred_spec' instead
+// of the return value, so Shade() can add it after the transmission blend
+// (otherwise dense glass multiplies its glints by (1-refractivity) and they
+// vanish; the glint is the surface's own reflection of the light source and
+// shouldn't fade with transparency).  Opaque surfaces are unaffected.
+Color DirectLight	 ( const HitInfo &hit, const Scene &scene, const Object &light, const Vec3 &movedPoint, int max_tree_depth, Color &deferred_spec );
 
 // computes the color/radiance from both the indirect light ( and if Config.enable_stratify_light is false then it also adds the direct light )
-Color IndirectLight	 ( const HitInfo &hit, const Scene &scene, const Object &light, const Vec3 &movedPoint, int max_tree_depth);
+Color IndirectLight	 ( const HitInfo &hit, const Scene &scene, const Object &light, const Vec3 &movedPoint, int max_tree_depth, Color &deferred_spec );
 
 // computes the color/radiance from a point light source...
-Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &light, const Vec3 &movedPoint, int max_tree_depth );
+Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &light, const Vec3 &movedPoint, int max_tree_depth, Color &deferred_spec );
 
 // computes the color after reflection...
 Color GetReflection( const HitInfo &hit, const Scene &scene, const Color origColor, const int max_tree_depth );
@@ -67,29 +73,33 @@ Color Shade( const HitInfo &hit, const Scene &scene, int max_tree_depth )
 	}
 
 	Color color( 0.0, 0.0, 0.0 );
-	
+
+	// Phong highlights on refractive surfaces, deferred past the
+	// transmission blend (see the declarations above).
+	Color deferredSpec( 0.0, 0.0, 0.0 );
+
 	// here we define a point slightly moved off the point of the surface.
-	// this is for shadows and reflections.  Calls to cast and trace will 
-	// not function properly becuase there will be an intersection to the 
+	// this is for shadows and reflections.  Calls to cast and trace will
+	// not function properly becuase there will be an intersection to the
 	// surface we called from.  So we move along the direction of the normal
 	Vec3 movedPoint = hit.point + (hit.normal * 0.001);
-    
+
     for( int i = 0; i < scene.num_lights; i++ )
     {
 		Object *light = scene.Light[i];
-		
-		if( !light->material.Emitter() ) continue;   // Skip non-emitters. 
+
+		if( !light->material.Emitter() ) continue;   // Skip non-emitters.
 
 		if(Config.enable_indirect_light)
 		{
 			// get indirect light...
-			color = IndirectLight(hit, scene, *light, movedPoint, max_tree_depth);
-			
+			color = IndirectLight(hit, scene, *light, movedPoint, max_tree_depth, deferredSpec);
+
 			if(Config.enable_stratify_light)
 			{
 				// IndirectLight() counted all light sources as black...
 				// we now have to add the direct light sources
-				color += DirectLight(hit, scene, *light, movedPoint, max_tree_depth);
+				color += DirectLight(hit, scene, *light, movedPoint, max_tree_depth, deferredSpec);
 			}
 		}
 		else
@@ -97,14 +107,16 @@ Color Shade( const HitInfo &hit, const Scene &scene, int max_tree_depth )
 			// The scene decides the light type: a Point emitter gets the analytic
 			// single-ray path (with specular); an emitter with actual area (sphere,
 			// quad, ...) gets Monte-Carlo soft shadows at Config.shadow_samples^2.
+			Color spec( 0.0, 0.0, 0.0 );
 			if( strcmp( light->MyNameIs(), "Point" ) == 0 || Config.shadow_samples < 1 )
 			{
-				color += PointLightShade( hit, scene, *light, movedPoint, max_tree_depth) / scene.num_lights;
+				color += PointLightShade( hit, scene, *light, movedPoint, max_tree_depth, spec ) / scene.num_lights;
 			}
 			else
 			{
-				color += DirectLight(hit, scene, *light, movedPoint, max_tree_depth) / scene.num_lights;
+				color += DirectLight( hit, scene, *light, movedPoint, max_tree_depth, spec ) / scene.num_lights;
 			}
+			deferredSpec += spec / scene.num_lights;   // same per-light weight as the color term
 		}
 	}
 
@@ -127,17 +139,22 @@ Color Shade( const HitInfo &hit, const Scene &scene, int max_tree_depth )
 
 	if( Config.enable_refraction ) color = GetRefraction( hit, scene, color, max_tree_depth );
 
+	// Highlights on glass ride on top of the transmission blend (POV-style
+	// additive phong); zero for opaque surfaces, whose highlights were added
+	// inside the light loop as before.
+	color += deferredSpec;
+
 	return color;
-} 
+}
 
 
-Color IndirectLight( const HitInfo &hit, const Scene &scene, const Object &light, const Vec3 &movedPoint, int max_tree_depth)
+Color IndirectLight( const HitInfo &hit, const Scene &scene, const Object &light, const Vec3 &movedPoint, int max_tree_depth, Color &deferred_spec )
 {
-	
+
 	if(max_tree_depth == 0)
 	{
 		// if the depth is at 0 then we only look at direct light...
-		return DirectLight(hit, scene, light, movedPoint, max_tree_depth);
+		return DirectLight(hit, scene, light, movedPoint, max_tree_depth, deferred_spec);
 	}
 
 	// radiance is actually a sum of all the radiance 
@@ -169,7 +186,7 @@ Color IndirectLight( const HitInfo &hit, const Scene &scene, const Object &light
 
 }
 
-Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, const Vec3 &movedPoint, int max_tree_depth )
+Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, const Vec3 &movedPoint, int max_tree_depth, Color &deferred_spec )
 {
 
 	Color color;
@@ -269,7 +286,10 @@ Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, 
 			// an mtl with Ns set but Ks black -- darkened it into a fake
 			// round "shadow" instead of a highlight.)
 			float specWeight = pow( RL, hit.Mtl().Phong_exp );
-			color += specWeight * hit.Mtl().specular;
+			if( Config.enable_refraction && hit.Mtl().refractivity > 0 )
+				deferred_spec += specWeight * hit.Mtl().specular;
+			else
+				color += specWeight * hit.Mtl().specular;
 		}
 	}
 
@@ -311,7 +331,7 @@ int SampleProjectedHemisphere(const Vec3 &P, const Vec3 &N, Sample *samples, con
 	return n*n;
 }
 
-Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &light, const Vec3 &movedPoint, int max_tree_depth )
+Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &light, const Vec3 &movedPoint, int max_tree_depth, Color &deferred_spec )
 {
 	Color color;
 	Color black(0,0,0);
@@ -408,7 +428,10 @@ Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &lig
 					// Additive Phong (see DirectLight): the old lerp replaced the
 					// diffuse under the lobe and turned dim/black speculars into
 					// dark blotches.
-					color += specWeight * hit.Mtl().specular;
+					if( Config.enable_refraction && hit.Mtl().refractivity > 0 )
+						deferred_spec += specWeight * hit.Mtl().specular;
+					else
+						color += specWeight * hit.Mtl().specular;
 				}
 			}		
 		}	
