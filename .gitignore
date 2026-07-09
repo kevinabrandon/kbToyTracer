@@ -60,3 +60,4 @@ scenes/*
 # Imported model library (see scenes/models/README.md for provenance)
 !scenes/models
 !scenes/models/**
+.claude/
