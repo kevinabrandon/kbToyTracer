@@ -6,8 +6,8 @@
 # per-instance materials -- copper, chrome, and glass.  The geometry and its
 # BVH are shared by all three instances.
 #
-# The SPD model carries its own 8x8 floor of quads at z=0, so each instance
-# is sunk 0.05 below this scene's floor top (z=-0.02) to hide its copy.
+# The prototype is the floorless SPD export (teapot -f), so each instance
+# sits directly on this scene's floor top (z=-0.02).
 
 eye          (0.0, -17.5, 8.0)
 lookat       (0.0, 0.0, 1.2)
@@ -17,7 +17,7 @@ vpdist       2.6
 amblight     [0.2, 0.2, 0.2]
 bgcolor      [0.15, 0.25, 0.35]
 
-import teapot-bvh-hq.sdf.gz as teapot
+import teapot-bvh-hq-nofloor.sdf.gz as teapot
 
 begin BVH
 
@@ -37,7 +37,7 @@ begin BVH
     # copper
     instance     teapot
     rotate       (0, 0, 1) 35
-    translate    (-6.6, 1.2, -0.05)
+    translate    (-6.6, 1.2, -0.02)
     diffuse      [0.80, 0.42, 0.18]
     specular     [1.0, 0.75, 0.55]
     Phong_exp    30
@@ -47,7 +47,7 @@ begin BVH
     instance     teapot
     scale        1.15
     rotate       (0, 0, 1) -20
-    translate    (0.2, 2.4, -0.05)
+    translate    (0.2, 2.4, -0.02)
     diffuse      [0.22, 0.26, 0.30]
     specular     [1, 1, 1]
     Phong_exp    60
@@ -56,7 +56,7 @@ begin BVH
     # glass
     instance     teapot
     rotate       (0, 0, 1) 145
-    translate    (6.6, 0.4, -0.05)
+    translate    (6.6, 0.4, -0.02)
     diffuse      [0.15, 0.30, 0.20]
     specular     [1, 1, 1]
     Phong_exp    40
