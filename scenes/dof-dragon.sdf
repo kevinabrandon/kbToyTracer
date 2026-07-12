@@ -6,7 +6,7 @@
 # (DoF renders only when the config sets dof_samples > 0.)
 #
 # See scene8-imports.sdf for the layout/material notes (sticky textures,
-# the teapot's sunken built-in floor, canonical import transforms).
+# the floorless teapot prototype, canonical import transforms).
 
 eye          (5.0,-2.0, 2.8)
 lookat       (0.0, 1.1, 0.25)
@@ -19,7 +19,7 @@ focalDist    7.73
 amblight     [0.2, 0.2, 0.2]
 bgcolor      [0.15, 0.25, 0.35]
 
-import teapot-bvh-hq.sdf.gz as teapot
+import teapot-bvh-hq-nofloor.sdf.gz as teapot
 import models/lucy.obj.gz as lucy
 import models/dragon.obj.gz as dragon
 
@@ -98,7 +98,7 @@ begin BVH
     instance     teapot
     scale        0.45
     rotate       (0, 0, 1) 30
-    translate    (-0.8, 1.9, -1.05)
+    translate    (-0.8, 1.9, -1.0)
     diffuse      [1, 1, 1]
     marble       [0.98, 0.88, 0.82] [0.96, 0.65, 0.58] [0.45, 0.18, 0.15] 0.3 5.0 8
     specular     [1.00, 0.85, 0.75]

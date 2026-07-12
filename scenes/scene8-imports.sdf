@@ -11,9 +11,9 @@
 # transforms.
 #
 # NOTE textures are sticky and can't be un-set, so the untextured gold
-# dragon comes before the marble objects. The teapot model carries its
-# own 8x8 floor of quads at z=0, so its instance is sunk 0.05 below the
-# room's floor top (z=-1) to hide it inside the floor box.
+# dragon comes before the marble objects. The teapot prototype is the
+# floorless SPD export (teapot -f), so its instance sits directly on the
+# room's floor top (z=-1).
 
 eye          (5.0,-2.0, 2.8)
 lookat       (0.0, 1.1, 0.25)
@@ -23,7 +23,7 @@ vpdist       2.75
 amblight     [0.2, 0.2, 0.2]
 bgcolor      [0.15, 0.25, 0.35]
 
-import teapot-bvh-hq.sdf.gz as teapot
+import teapot-bvh-hq-nofloor.sdf.gz as teapot
 import models/lucy.obj.gz as lucy
 import models/dragon.obj.gz as dragon
 
@@ -102,7 +102,7 @@ begin BVH
     instance     teapot
     scale        0.45
     rotate       (0, 0, 1) 30
-    translate    (-0.8, 1.9, -1.05)
+    translate    (-0.8, 1.9, -1.0)
     diffuse      [1, 1, 1]
     marble       [0.98, 0.88, 0.82] [0.96, 0.65, 0.58] [0.45, 0.18, 0.15] 0.3 5.0 8
     specular     [1.00, 0.85, 0.75]

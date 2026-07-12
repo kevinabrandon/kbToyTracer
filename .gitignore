@@ -46,6 +46,7 @@ scenes/*
 !scenes/scene7-dof.sdf
 !scenes/scene8-imports.sdf
 !scenes/dof-dragon.sdf
+!scenes/dof-dragon-glass.sdf
 !scenes/room-spheres.sdf
 !scenes/room-ellipsoids-plain.sdf
 !scenes/room-ellipsoids-reflect.sdf
@@ -54,6 +55,7 @@ scenes/*
 !scenes/blurry.sdf
 !scenes/refract-focus.sdf
 !scenes/teapot-bvh-hq.sdf.gz
+!scenes/teapot-bvh-hq-nofloor.sdf.gz
 !scenes/teapot-trio.sdf
 !scenes/cornell-box.sdf
 !scenes/dragon.sdf

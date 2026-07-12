@@ -1,0 +1,137 @@
+# Glass variant of dof-dragon.sdf (the stage-12/13 progression scene):
+# same room, light, and trio of imported meshes, all untextured. The
+# teapot is 75% refractive glass (IOR 1.5); the dragon and Lucy are
+# 20% reflective. Rearranged: teapot up front, dragon behind it to the
+# left, Lucy in the back right. No lens — pinhole camera.
+
+eye          (5.0,-2.0, 2.8)
+lookat       (0.0, 1.1, 0.25)
+up           (0.0, 0.0, 1.0)
+vpdist       2.75
+
+amblight     [0.2, 0.2, 0.2]
+bgcolor      [0.15, 0.25, 0.35]
+
+import teapot-bvh-hq-nofloor.sdf.gz as teapot
+import models/lucy.obj.gz as lucy
+import models/dragon.obj.gz as dragon
+
+begin BVH
+
+    ## Four small spherical lights ringing the scene (point lights when
+    ## shadow_samples = 0), each 1/4 the old single light's emission.
+
+    sphere       (-1.5, -2.0, 6.0) 0.4
+    diffuse      [1, 1, 1]
+    emission     [0.75, 0.75, 0.75]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+    sphere       (3.0, -4.5, 5.5) 0.4
+    diffuse      [1, 1, 1]
+    emission     [0.75, 0.75, 0.75]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+    sphere       (-3.0, 1.0, 5.5) 0.4
+    diffuse      [1, 1, 1]
+    emission     [0.75, 0.75, 0.75]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+    sphere       (2.5, 4.5, 5.5) 0.4
+    diffuse      [1, 1, 1]
+    emission     [0.75, 0.75, 0.75]
+    specular     [1, 1, 1]
+    reflectivity 0
+    Phong_exp    0
+
+    ## The colored room: red wall in back, green to the right, cyan to
+    ## the left (out of direct view), and a half-height yellow wall
+    ## behind the camera, which looks over it.
+
+    quad         (-4, 6, -1) (-4, 6, 4) (-4, -6, 4) (-4, -6, -1)
+    diffuse      [1, 0, 0]
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    0
+
+    quad         (4, 6, -1) (4, 6, 4) (-4, 6, 4) (-4, 6, -1)
+    diffuse      [0, 1, 0]
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    0
+
+    quad         (-4, -6, -1) (-4, -6, 4) (4, -6, 4) (4, -6, -1)
+    diffuse      [0, 1, 1]
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    0
+
+    quad         (4, -6, -1) (4, -6, 1) (4, 6, 1) (4, 6, -1)
+    diffuse      [1, 1, 0]
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0
+    Phong_exp    0
+
+    ## The dragon, behind the teapot on the left: gold, 20% reflective
+    ## (before any texture line so it doesn't inherit a sticky one).
+
+    instance      dragon
+    rotate        (1, 0, 0) 90
+    translate     (0, 0, 0.283)
+    scale         2.7
+    rotate        (0, 0, 1) 175
+    translate     (-1.55, 1.0, -1)
+    diffuse       [0.85, 0.65, 0.2]
+    specular      [1.0, 0.9, 0.6]
+    refractivity  0
+    reflectivity  0.20
+    Phong_exp     40
+
+    ## The floor: checkered (0.25x0.25-unit checks), 20% reflective.
+
+    box          (-4, -6, -2) (4, 6, -1)
+    diffuse      [1, 1, 1]
+    checkerTex   [0.84, 0.87, 0.63] [0.25, 0.28, 0.20] 2.0
+    specular     [1, 1, 1]
+    refractivity 0
+    reflectivity 0.20
+    Phong_exp    0
+
+    ## The teapot up front: untextured 75% glass.
+
+    instance      teapot
+    scale         0.55
+    rotate        (0, 0, 1) 30
+    translate     (0.4, 1.0, -1.0)
+    diffuse       [1, 1, 1]
+    specular      [1, 1, 1]
+    refractivity  0.75
+    index_refract 1.5
+    reflectivity  0
+    Phong_exp     15
+
+    ## Lucy, pulled 1.5 units toward the camera: weathered white marble
+    ## again (softly clouded), still 20% reflective.
+
+    instance      lucy
+    translate     (-691, 121, 606)
+    scale         0.00224
+    rotate        (0, 0, 1) -156
+    translate     (-0.53, 3.06, -1)
+    diffuse       [1, 1, 1]
+    marble        [0.96, 0.95, 0.92] [0.90, 0.89, 0.86] [0.55, 0.57, 0.60] 0.55 10 6
+    specular      [1, 1, 1]
+    refractivity  0
+    reflectivity  0.20
+    Phong_exp     12
+
+end

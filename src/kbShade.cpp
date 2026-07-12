@@ -271,7 +271,11 @@ Color DirectLight( const HitInfo &hit, const Scene &scene, const Object &light, 
 
 	// Phong specular highlight, mirroring PointLightShade() so highlights
 	// don't vanish just because a light has area: aim at the light's center.
-	if( Config.enable_specular && hit.ray.type != inside_ray
+	// The inside_ray skip only applies to refractive hits: single-sheet
+	// meshes break crossing parity, so an "inside" ray can legitimately
+	// land on an opaque surface -- shade it normally (see PointLightShade).
+	if( Config.enable_specular
+	    && ( hit.ray.type != inside_ray || hit.Mtl().refractivity <= 0 )
 	    && hit.Mtl().Phong_exp != 0 )
 	{
 		Vec3 direcToCenter = Unit( light.GetBounds().Center() - hit.point );
@@ -360,7 +364,12 @@ Color PointLightShade( const HitInfo &hit, const Scene &scene, const Object &lig
 	// the light and subtracting it by the point of intersection
 	Vec3 direcToLight = Unit(lightPos - hit.point);
 
-	if( hit.ray.type != inside_ray )
+	// Skip direct lighting only when an inside-glass ray hits another
+	// refractive boundary. Single-sheet meshes break crossing parity, so
+	// an "inside" ray can legitimately land on an opaque surface (e.g. a
+	// floor a glass mesh overlaps) -- that surface must be lit normally,
+	// or it renders ambient-only no matter the lights or shadow mode.
+	if( hit.ray.type != inside_ray || hit.Mtl().refractivity <= 0 )
 	{
 		if (Config.enable_shading)
 		{
